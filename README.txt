@@ -12,7 +12,7 @@ git clone git://github.com/bigbluebutton/bigbluebutton.git
 
 cd ../lib
 #手动编译需要的工具包
-apt-get install make build-essential libtool libtiff4-dev zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev --yes
+apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev --yes
 #ruby安装
 wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p290.tar.gz
 tar xvzf ruby-1.9.2-p290.tar.gz
@@ -159,10 +159,77 @@ update-rc.d bbb-openoffice-headless defaults
 	###############
 	####使用git clone下来的版本，通过编译安装
 	###############
+	#先安装依赖的libtiff
+	wget ftp://ftp.remotesensing.org/pub/libtiff/tiff-4.0.3.tar.gz
+	tar -xvf tiff-4.0.3.tar.gz
+	cd tiff-4.0.3
+	./configure
+	make
+	make install
+	#####make时出错，使用下列方法即可：
+	#####vi /usr/local/include/jmorecfg.h
+	#####modify typedef enum { FALSE = 0 , TRUE = 1 } boolean; to typedef enum { false= 0 , true= 1 } boolean;
+	cd freeswitch
 	./bootstrap.sh
 	./configure
 	make
 	make install
+	###安装成功信息
++---------- FreeSWITCH install Complete ----------+
+ + FreeSWITCH has been successfully installed.     +
+ +                                                 +
+ +       Install sounds:                           +
+ +       (uhd-sounds includes hd-sounds, sounds)   +
+ +       (hd-sounds includes sounds)               +
+ +       ------------------------------------      +
+ +                make cd-sounds-install           +
+ +                make cd-moh-install              +
+ +                                                 +
+ +                make uhd-sounds-install          +
+ +                make uhd-moh-install             +
+ +                                                 +
+ +                make hd-sounds-install           +
+ +                make hd-moh-install              +
+ +                                                 +
+ +                make sounds-install              +
+ +                make moh-install                 +
+ +                                                 +
+ +       Install non english sounds:               +
+ +       replace XX with language                  +
+ +       (ru : Russian)                            +
+ +       ------------------------------------      +
+ +                make cd-sounds-XX-install        +
+ +                make uhd-sounds-XX-install       +
+ +                make hd-sounds-XX-install        +
+ +                make sounds-XX-install           +
+ +                                                 +
+ +       Upgrade to latest:                        +
+ +       ----------------------------------        +
+ +                make current                     +
+ +                                                 +
+ +       Rebuild all:                              +
+ +       ----------------------------------        +
+ +                make sure                        +
+ +                                                 +
+ +       Install/Re-install default config:        +
+ +       ----------------------------------        +
+ +                make samples                     +
+ +                                                 +
+ +                                                 +
+ +       Additional resources:                     +
+ +       ----------------------------------        +
+ +       http://www.freeswitch.org                 +
+ +       http://wiki.freeswitch.org                +
+ +       http://jira.freeswitch.org                +
+ +       http://lists.freeswitch.org               +
+ +                                                 +
+ +       irc.freenode.net / #freeswitch            +
+ +                                                 +
+ +       Register For ClueCon:                     +
+ +       ----------------------------------        +
+ +       http://www.cluecon.com                    +
+ +                                                 +
+ +-------------------------------------------------+
 	11.2、配置
 	cd /opt/freeswitch/
 	tar xzvf /tmp/bbb/freeswitch-config.tar.gz
