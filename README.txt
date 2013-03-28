@@ -1,3 +1,17 @@
+###语言设置
+export LANGUAGE="en_US:en"
+#export LC_ALL=(unset)
+export LC_PAPER="en_US.UTF-8"
+export LC_ADDRESS="en_US.UTF-8"
+export LC_MONETARY="en_US.UTF-8"
+export LC_NUMERIC="en_US.UTF-8"
+export LC_TELEPHONE="en_US.UTF-8"
+export LC_IDENTIFICATION="en_US.UTF-8"
+export LC_MEASUREMENT="en_US.UTF-8"
+export LC_TIME="en_US.UTF-8"
+export LC_NAME="en_US.UTF-8"
+export LANG="en_US.UTF-8"
+
 cd /data/current/repertory
 apt-get install git
 1、下载相关源代码
@@ -12,7 +26,7 @@ git clone git://github.com/bigbluebutton/bigbluebutton.git
 
 cd ../lib
 #手动编译需要的工具包
-apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev --yes
+apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev ant --yes
 #ruby安装
 wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p290.tar.gz
 tar xvzf ruby-1.9.2-p290.tar.gz
@@ -115,6 +129,7 @@ apt-get install imagemagick
 	##使用git clone下来的red5
 	###############
 	mv red5-0.9.1 /usr/share/red5
+	ln -s /usr/share/red5/red5.sh  /usr/bin/red5
 	8.2、建立red5用户
 	adduser --system --home /usr/share/red5 --no-create-home --group --disabled-password --shell /bin/false red5
 	8.3、权限设置
@@ -149,16 +164,25 @@ chmod +x /etc/init.d/bbb-openoffice-headless
 update-rc.d activemq defaults
 update-rc.d red5 defaults
 update-rc.d bbb-openoffice-headless defaults
+##################
+##这些启动脚本可以保留至0.8版本，因为它们不涉及逻辑部分，只涉及启动参数等。
+##################
 
 11、安装freeswitch
 	11.1、安装
+	##12.04不支持下列安装，10.04支持。
 	##apt-get install python-software-properties
 	##add-apt-repository ppa:freeswitch-drivers/freeswitch-nightly-drivers 
 	##apt-get update
 	##apt-get install freeswitch freeswitch-lang-en
+	
 	###############
-	####使用git clone下来的版本，通过编译安装
+	####使用git clone下来的版本，通过源代码编译安装
 	###############
+	#查看了官网，源代码安装依赖库，现贴出官方发布的依赖库。
+ 	#apt-get install git-core subversion build-essential autoconf automake libtool libncurses5 libncurses5-dev make libjpeg-dev libcurl4-openssl-dev libexpat1-dev libgnutls-dev libtiff4-dev libx11-dev unixodbc-dev libssl-dev python2.6-dev zlib1g-dev libzrtpcpp-dev libasound2-dev libogg-dev libvorbis-dev libperl-dev libgdbm-dev libdb-dev python-dev uuid-dev
+ 	#sudo apt-get install gawk
+	#update-alternatives --set awk /usr/bin/gawk
 	#先安装依赖的libtiff
 	wget ftp://ftp.remotesensing.org/pub/libtiff/tiff-4.0.3.tar.gz
 	tar -xvf tiff-4.0.3.tar.gz
@@ -174,6 +198,9 @@ update-rc.d bbb-openoffice-headless defaults
 	./configure
 	make
 	make install
+	make uhd-sounds-install
+	make uhd-moh-install
+	make samples
 	###安装成功信息
 +---------- FreeSWITCH install Complete ----------+
  + FreeSWITCH has been successfully installed.     +
@@ -230,7 +257,61 @@ update-rc.d bbb-openoffice-headless defaults
  +       http://www.cluecon.com                    +
  +                                                 +
  +-------------------------------------------------+
-	11.2、配置
+ 
+ 	####生成deb方式安装
+ 	cd freeswitch/debian
+	./bootstrap.sh
+	cd ..
+	#（方法一）检查依赖是否满足，如果不满组此命令会打印出需要的lib，使用apt-get即可安装。
+	dpkg-checkbuilddeps
+ 	apt-get install unixodbc-dev libpq-dev python-dev erlang-dev doxygen uuid-dev libexpat1-dev libgdbm-dev libdb-dev ladspa-sdk libsnmp-dev libflac-dev libvlc-dev default-jdk gcj-jdk debhelper
+ 	#检查依赖方法二。
+ 	apt-get install devscripts equivs
+ 	mk-build-deps -i 
+ 	#生成deb
+ 	dpkg-buildpackage -b
+ 	mkdir dbg
+	mv *dbg_*.deb dbg
+	#Then install the freeswitch lib package first
+	dpkg -i libfreeswitch1_*.deb
+	#Then install the rest of the deb packages
+	dpkg -i freeswitch*.deb
+	
+	11.2、配置（此配置对应于源代码安装）
+	#默认安装到/usr/local/并不是/opt，所以接下来要处理启动脚本中/opt路径的替换问题。
+	sed debian/freeswitch-sysvinit.freeswitch.init -e s,opt,usr/local, >/etc/init.d/freeswitch
+	chmod 755 /etc/init.d/freeswitch
+	#生成启动脚本
+	update-rc.d -f freeswitch defaults
+	cp debian/freeswitch-sysvinit.freeswitch.default /etc/default/freeswitch # (** change to "true" **)
+	#添加freeswitch用户:  
+	adduser --disabled-password  --quiet --system \
+	  --home /opt/freeswitch \
+	  --gecos "FreeSwitch Voice Platform" --ingroup daemon \
+	  freeswitch
+	adduser freeswitch audio
+	#设置/opt/freeswitch所有者 (from root)
+	chown -R freeswitch:daemon /opt/freeswitch/
+	#Remove permissions for other
+	chmod -R o-rwx /opt/freeswitch/
+	#添加符号链接到系统执行路径
+	#ln -s /opt/freeswitch/bin/fs_cli /usr/local/bin/
+	mkdir /var/lib/freeswitch
+	ln -s /usr/local/freeswitch/bin/freeswitch /usr/bin/freeswitch
+	#重启服务 - 关于脚本不能执行的问题：将start部分的--quiet替换为--background 同时删除--test选项
+	/etc/init.d/freeswitch start
+	or
+	service freeswitch start
+	# test its startup
+	fs_cli
+	11.3、配置（此配置对应于deb安装）
+	cp freeswitch/conf/vanilla /etc/freeswitch
+	#That's it!
+	/etc/init.d/freeswitch start
+	#wait for freeswitch to start and then connect to it:
+	fs_cli
+	11.4、将freeswitch和bbb集成的配置
+	#将bbb下载的配置放入opt下。
 	cd /opt/freeswitch/
 	tar xzvf /tmp/bbb/freeswitch-config.tar.gz
 	chown -R freeswitch:daemon conf
