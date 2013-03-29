@@ -1,0 +1,48 @@
+*>ivy将使用maven2 仓库来解析你在ivy文件中声明的依赖
+*> ivy.xml这个文件用于描述项目对其他类库的依赖
+	@>例子
+	<ivy-module　version="2.0"> 
+　　　　<info　organisation="apache"　module="hello-ivy"/> ##依赖模块的相关信息定义
+　　　　<dependencies>##定义依赖库列表
+　　　　	##org:依赖库所属组织	name:依赖库名称	rev:依赖库版本	三个属性值要匹配仓库中的值否则找不到库。
+　　　　	<dependency　org="commons-lang"　name="commons-lang"　rev="2.0"/>
+　　　　	<dependency　org="commons-cli"　name="commons-cli"　rev="1.0"/>
+　　　　</dependencies>
+	</ivy-module>
+*>在ant中嵌入ivy依赖定义——ivy和ant集成。
+	@>例子
+	<target　name="resolve"　description="-->　retrieve　dependencies　with　ivy">
+　　 	<ivy:retrieve　/>
+　　 </target>
+*>Ivy 使用"ivy.default.ivy.user.dir"环境变量作为工作目录
+*>ivy通过以下方式确认工作目录的具体路径
+	$>查找ivy.default.ivy.user.dir变量
+	$>如果没有找到，查找变量ivy.home
+	$>如果还没有找到，查找变量user.home，然后使用user.home/.ivy目录
+	&>默认安装而没有专门设置前，前两个变量不存在，因此ivy就会使用user.home作为默认工作目录.
+*>Ivy 使用cache目录来存放缓存文件，ivy通过以下方式确认该目录的具体路径
+	$>查找变量ivy.cache.dir
+	$>如果没有找到，使用ivy.default.ivy.user.dir/cache
+	&>默认安装而没有专门设置前，前ivy.cache.dir变量不存在，因此ivy就会使用ivy.default.ivy.user.dir/cache
+*>可以在ant中设置上述变量，也可通过export设置。
+	@>例子
+	<property name="ivy.default.ivy.user.dir" value="/open/lab/lib" />
+*>依赖库库地址的配置在ivysettings.xml文件中。
+	@>例子
+	<ivysettings>
+    <settings defaultResolver="chain"/>
+    <resolvers>
+        <chain name="chain">
+            <ibiblio name="central" m2compatible="true"/>
+            <ibiblio name="springsource-external" m2compatible="true" root="http://repository.springsource.com/maven/bundles/external"/>
+            <ibiblio name="springsource-release" m2compatible="true" root="http://repository.springsource.com/maven/bundles/release"/>
+            <url name="mavencentral">
+                <artifact pattern="http://repo1.maven.org/maven2/[organisation]/[artifact]-[revision].[ext]" />
+            </url>
+			<url name="jboss">
+                <artifact pattern="https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/[revision]/[artifact]-[revision].[ext]" />
+            </url>
+        </chain>
+    </resolvers>
+	</ivysettings>
+	
