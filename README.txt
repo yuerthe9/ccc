@@ -128,7 +128,14 @@ apt-get install imagemagick
 	###############
 	##使用git clone下来的red5
 	###############
-	mv red5-0.9.1 /usr/share/red5
+	cd red5
+	make ##如果出现依赖错误，获取最新的配置文件替换：http://red5.googlecode.com/svn/java/server/tags/1_0/ivysettings.xml
+		##如果还有问题，那就只能手动查找依赖库的maven地址了。例如httpcore还是找不到，在http://mvnrepository.com查找httpcore，找到后根据它提供的配置把org的值更改为org.apache.httpcomponents即可成功下载
+		##还有两个maven仓库网站：https://repository.apache.org  http://repository.sonatype.org
+		##jython 需要的是<dependency org="org.python" name="jython" rev="2.2" /> 默认是2.5
+		##ehcache 版本是对的但是jar包无法下载，需要手动下载到lib目录才行。
+	make install #默认是/usr/lib修改Makefile内容为/usr/share
+	#mv red5-0.9.1 /usr/share/red5
 	ln -s /usr/share/red5/red5.sh  /usr/bin/red5
 	8.2、建立red5用户
 	adduser --system --home /usr/share/red5 --no-create-home --group --disabled-password --shell /bin/false red5
