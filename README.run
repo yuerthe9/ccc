@@ -1,0 +1,16 @@
+service freeswitch start
+service red5 start
+service activemq start
+service bbb-openoffice-headless start
+service tomcat6 start
+service nginx start
+
+
+
+
+service red5 stop
+service nginx stop
+service activemq stop
+service tomcat6 stop
+service bbb-openoffice-headless stop
+service freeswitch stop

@@ -1,0 +1,7 @@
+BBB-client 使用actionscript编写
+BBB-server 使用java/grails/scala
+
+如何关闭进入会议时播放的声音？
+    sudo vi /opt/freeswitch/conf/autoload_configs/conference.conf.xml
+    注释调用:<param name="moh-sound" value="$${hold_music}"/>
+    重启BBB即可，此方法为0.8版本。

@@ -1,0 +1,166 @@
+echo "export LANGUAGE='en_US:en'
+#export LC_ALL=(unset)
+export LC_PAPER='en_US.UTF-8'
+export LC_ADDRESS='en_US.UTF-8'
+export LC_MONETARY='en_US.UTF-8'
+export LC_NUMERIC='en_US.UTF-8'
+export LC_TELEPHONE='en_US.UTF-8'
+export LC_IDENTIFICATION='en_US.UTF-8'
+export LC_MEASUREMENT='en_US.UTF-8'
+export LC_TIME='en_US.UTF-8'
+export LC_NAME='en_US.UTF-8'
+export LANG='en_US.UTF-8'" >> ~/.bashrc
+
+source ~/.bashrc
+
+apt-get update
+apt-get upgrade -y
+apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev ant --yes
+
+apt-get install mysql-server -y
+apt-get install tomcat6 -y
+
+cd ~
+mkdir lib
+cd lib
+
+#安装swftools依赖的库gif、jpeg、pdf
+apt-get install libgif-dev libjpeg-dev libfreetype6 libfreetype6-dev -y
+wget http://www.swftools.org/swftools-0.9.2.tar.gz
+tar -xvf swftools-0.9.2.tar.gz
+cd swftools-0.9.2
+./configure>/dev/null&&make>/dev/null&& make install>/dev/null
+
+cd ..
+apt-get install imagemagick -y
+apt-get install nginx -y
+
+apt-get install jsvc -y
+wget http://apache.sunsite.ualberta.ca//activemq/apache-activemq/5.4.3/apache-activemq-5.4.3-bin.tar.gz
+tar zxvf apache-activemq-5.4.3-bin.tar.gz
+mv apache-activemq-5.4.3 /usr/share/activemq
+chown -R root:root /usr/share/activemq
+
+wget http://red5.org/downloads/red5/0_9/red5-0.9.1.tar.gz
+tar xvf red5-0.9.1.tar.gz
+mv red5-0.9.1 /usr/share/red5
+adduser --system --home /usr/share/red5 --no-create-home --group --disabled-password --shell /bin/false red5
+chown -R root:root /usr/share/red5
+chown -R red5:adm /usr/share/red5/log
+chmod 755 /usr/share/red5/log
+chgrp red5 /usr/share/red5/webapps
+chmod 775 /usr/share/red5/webapps
+
+
+mkdir bbb
+cd bbb
+wget http://bigbluebutton.org/downloads/0.71a/init-scripts.tar.gz
+wget http://bigbluebutton.org/downloads/0.71a/freeswitch-config.tar.gz
+
+wget http://bigbluebutton.org/downloads/0.71a/red5-bigbluebutton.tar.gz
+wget http://bigbluebutton.org/downloads/0.71a/red5-deskshare.tar.gz
+wget http://bigbluebutton.org/downloads/0.71a/red5-sip.tar.gz
+wget http://bigbluebutton.org/downloads/0.71a/red5-video.tar.gz
+
+wget http://bigbluebutton.org/downloads/0.71a/www-bigbluebutton-default.tar.gz
+wget http://bigbluebutton.org/downloads/0.71a/www-bigbluebutton.tar.gz
+
+wget http://bigbluebutton.org/downloads/0.71a/bigbluebutton.war
+wget http://bigbluebutton.org/downloads/0.71a/nginx-bigbluebutton.conf
+
+wget http://bigbluebutton.org/downloads/0.71a/bbb-conf
+cd ..
+
+
+tar xzvf bbb/init-scripts.tar.gz -C /etc/init.d
+chmod +x /etc/init.d/activemq
+chmod +x /etc/init.d/red5
+chmod +x /etc/init.d/bbb-openoffice-headless
+update-rc.d activemq defaults
+update-rc.d red5 defaults
+update-rc.d bbb-openoffice-headless defaults
+sed /etc/init.d/bbb-openoffice-headless -e 's,killall -9 soffice &&,,' >/etc/init.d/bbb-openoffice-headless
+
+apt-get install openoffice.org -y
+
+apt-get -y install build-essential automake autoconf git-core wget libtool
+apt-get -y install libncurses5-dev libtiff-dev libjpeg-dev zlib1g-dev
+git clone git://git.freeswitch.org/freeswitch.git
+cd freeswitch && ./bootstrap.sh&&./configure&&make install &&make sounds-install&&make moh-install
+#sed debian/freeswitch-sysvinit.freeswitch.init -e s,opt,usr/local, >/etc/init.d/freeswitch
+cp debian/freeswitch-sysvinit.freeswitch.init /etc/init.d/freeswitch
+mkdir /var/lib/freeswitch
+chown -R freeswitch:freeswitch /var/lib/freeswitch
+chmod 755 /etc/init.d/freeswitch
+update-rc.d -f freeswitch defaults
+cp debian/freeswitch-sysvinit.freeswitch.default /etc/default/freeswitch
+addgroup freeswitch
+adduser --disabled-password  --quiet --system --home /usr/local/freeswitch --gecos "FreeSwitch Voice Platform" --ingroup freeswitch freeswitch
+adduser freeswitch audio
+chown -R freeswitch:freeswitch /usr/local/freeswitch/
+chmod -R o-rwx /usr/local/freeswitch/
+ln -sf /usr/local/freeswitch/bin/freeswitch /usr/bin/
+ln -sf /usr/local/freeswitch/bin/fs_cli /usr/bin/
+cd ..
+tar xzvf bbb/freeswitch-config.tar.gz -C /usr/local/freeswitch
+chown -R freeswitch:freeswitch /usr/local/freeswitch/conf
+chmod -R 755 /usr/local/freeswitch/conf
+#sed -i 's/FREESWITCH_ENABLED=\"false\"/FREESWITCH_ENABLED=\"true\"/g' /etc/default/freeswitch
+echo "FREESWITCH_ENABLED=\"true\"">> /etc/default/freeswitch
+
+cat bbb/nginx-bigbluebutton.conf  | sed "s/192.168.0.35/10.241.211.248/" > /etc/nginx/sites-available/bigbluebutton
+#Enable the bigbluebutton nginx config
+ln -s /etc/nginx/sites-available/bigbluebutton /etc/nginx/sites-enabled/bigbluebutton
+
+#default=no
+#sed -i "s/#TOMCAT6_SECURITY=yes/TOMCAT6_SECURITY=no/" /etc/default/tomcat6
+
+#mysql -u root -p
+#create database bigbluebutton_dev;
+#grant all on bigbluebutton_dev.* to 'bbb'@'localhost' identified by 'secret';
+#flush privileges;
+#quit
+
+cp bbb/bigbluebutton.war /var/lib/tomcat6/webapps/
+#vi /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+#设置swfToolsDir目录、imageMagickDir目录、ghostScriptExec执行路径
+#bigbluebutton.web.serverURL=http://10.241.211.248设置为本机IP
+#beans.dynamicConferenceService.securitySalt=0x6250C6229BAD11E2A6373A086188709B
+mkdir /etc/bigbluebutton
+echo "%!
+/pdfmark {cleartomark} bind def" > /etc/bigbluebutton/nopdfmark.ps
+
+mkdir /var/bigbluebutton
+chown -R tomcat6:adm /var/bigbluebutton
+chmod -R 777 /var/bigbluebutton
+
+tar xzvf bbb/red5-bigbluebutton.tar.gz -C /usr/share/red5/webapps
+tar xzvf bbb/red5-deskshare.tar.gz -C /usr/share/red5/webapps
+tar xzvf bbb/red5-video.tar.gz -C /usr/share/red5/webapps
+tar xzvf bbb/red5-sip.tar.gz -C /usr/share/red5/webapps
+#sed /usr/share/red5/webapps/sip/WEB-INF/bigbluebutton-sip.properties -e 's/192.168.0.35/10.241.211.248/g' >/usr/share/red5/webapps/sip/WEB-INF/bigbluebutton-sip.properties
+
+mkdir /var/www
+###default web pages
+tar xzvf bbb/www-bigbluebutton-default.tar.gz -C /var/www
+###bbb-client
+tar xzvf bbb/www-bigbluebutton.tar.gz -C /var/www
+echo "<%!
+// This is the security salt that must match the value set in the BigBlueButton server
+String salt = \"0x6250C6229BAD11E2A6373A086188709B\";
+
+// This is the URL for the BigBlueButton server
+String BigBlueButtonURL = \"http://42.120.7.154/bigbluebutton/\";//this is ip for remote
+%>" > /var/lib/tomcat6/webapps/bigbluebutton/demo/bbb_api_conf.jsp
+#sed /var/www/bigbluebutton/client/conf/config.xml -e 's/192.168.0.35/10.241.211.248/g' >/var/www/bigbluebutton/client/conf/config.xml
+
+
+cp bbb/bbb-conf /usr/local/bin
+chmod a+x /usr/local/bin/bbb-conf 
+
+# create directory for log files
+mkdir /var/log/bigbluebutton
+# create an empty log file
+touch /var/log/bigbluebutton/bbb-web.log
+chown tomcat6:tomcat6 /var/log/bigbluebutton/bbb-web.log
+
