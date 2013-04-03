@@ -36,7 +36,7 @@ apt-get install imagemagick -y
 apt-get install nginx -y
 
 apt-get install jsvc -y
-wget http://apache.sunsite.ualberta.ca//activemq/apache-activemq/5.4.3/apache-activemq-5.4.3-bin.tar.gz
+wget http://apache.sunsite.ualberta.ca/activemq/apache-activemq/5.4.3/apache-activemq-5.4.3-bin.tar.gz
 tar zxvf apache-activemq-5.4.3-bin.tar.gz
 mv apache-activemq-5.4.3 /usr/share/activemq
 chown -R root:root /usr/share/activemq
@@ -109,6 +109,7 @@ chmod -R 755 /usr/local/freeswitch/conf
 echo "FREESWITCH_ENABLED=\"true\"">> /etc/default/freeswitch
 
 cat bbb/nginx-bigbluebutton.conf  | sed "s/192.168.0.35/10.241.211.248/" > /etc/nginx/sites-available/bigbluebutton
+#修改/var/www/nginx-default为/usr/share/nginx/www
 #Enable the bigbluebutton nginx config
 ln -s /etc/nginx/sites-available/bigbluebutton /etc/nginx/sites-enabled/bigbluebutton
 
@@ -124,21 +125,26 @@ ln -s /etc/nginx/sites-available/bigbluebutton /etc/nginx/sites-enabled/bigblueb
 cp bbb/bigbluebutton.war /var/lib/tomcat6/webapps/
 #vi /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
 #设置swfToolsDir目录、imageMagickDir目录、ghostScriptExec执行路径
-#bigbluebutton.web.serverURL=http://10.241.211.248设置为本机IP
+#bigbluebutton.web.serverURL=http://42.120.7.154设置为本机IP
 #beans.dynamicConferenceService.securitySalt=0x6250C6229BAD11E2A6373A086188709B
 mkdir /etc/bigbluebutton
 echo "%!
 /pdfmark {cleartomark} bind def" > /etc/bigbluebutton/nopdfmark.ps
 
 mkdir /var/bigbluebutton
+mkdir /var/log/bigbluebutton
 chown -R tomcat6:adm /var/bigbluebutton
+chown -R tomcat6:adm /var/log/bigbluebutton
 chmod -R 777 /var/bigbluebutton
+chmod -R 777 /var/log/bigbluebutton
 
 tar xzvf bbb/red5-bigbluebutton.tar.gz -C /usr/share/red5/webapps
 tar xzvf bbb/red5-deskshare.tar.gz -C /usr/share/red5/webapps
 tar xzvf bbb/red5-video.tar.gz -C /usr/share/red5/webapps
 tar xzvf bbb/red5-sip.tar.gz -C /usr/share/red5/webapps
-#sed /usr/share/red5/webapps/sip/WEB-INF/bigbluebutton-sip.properties -e 's/192.168.0.35/10.241.211.248/g' >/usr/share/red5/webapps/sip/WEB-INF/bigbluebutton-sip.properties
+###这里直接做到tar包中，就不用后来在修改了
+#sed /usr/share/red5/webapps/sip/WEB-INF/bigbluebutton-sip.properties -e 's/192.168.0.35/127.0.0.1/g' >/usr/share/red5/webapps/sip/WEB-INF/bigbluebutton-sip.properties
+
 
 mkdir /var/www
 ###default web pages
@@ -152,11 +158,12 @@ String salt = \"0x6250C6229BAD11E2A6373A086188709B\";
 // This is the URL for the BigBlueButton server
 String BigBlueButtonURL = \"http://42.120.7.154/bigbluebutton/\";//this is ip for remote
 %>" > /var/lib/tomcat6/webapps/bigbluebutton/demo/bbb_api_conf.jsp
-#sed /var/www/bigbluebutton/client/conf/config.xml -e 's/192.168.0.35/10.241.211.248/g' >/var/www/bigbluebutton/client/conf/config.xml
+#sed /var/www/bigbluebutton/client/conf/config.xml -e 's/192.168.0.35/42.120.7.154/g' >/var/www/bigbluebutton/client/conf/config.xml
 
 
 cp bbb/bbb-conf /usr/local/bin
 chmod a+x /usr/local/bin/bbb-conf 
+#将/opt/freeswitch替换为/usr/local/freeswitch
 
 # create directory for log files
 mkdir /var/log/bigbluebutton
