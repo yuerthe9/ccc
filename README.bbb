@@ -5,3 +5,4 @@ BBB-server 使用java/grails/scala
     sudo vi /opt/freeswitch/conf/autoload_configs/conference.conf.xml
     注释调用:<param name="moh-sound" value="$${hold_music}"/>
     重启BBB即可，此方法为0.8版本。
+
