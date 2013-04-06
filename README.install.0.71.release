@@ -22,7 +22,7 @@ apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev liby
 echo 
 echo 安装mysql
 echo "#######################################"
-apt-get install mysql-server -y >/dev/null
+apt-get install mysql-server -y
 echo 
 echo 安装tomcat6
 echo "#######################################"
