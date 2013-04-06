@@ -1,0 +1,139 @@
+####################
+#bbb-common-message#
+####################
+#1、修改build.gradle
+	flatDir name: 'fileRepo', dirs: "/home/firstuser/dev/repo"
+	to
+	flatDir name: 'fileRepo', dirs: "repo"
+#2、依赖库找不到的问题（这笔账是否应该算在开发人员身上？^.^）
+	:: #slf4j-api;1.5.10: not found
+	:: #logback-core;0.9.18: not found
+	:: #logback-classic;0.9.18: not found
+	:: #jcl-over-slf4j;1.5.10: not found
+	:: #log4j-over-slf4j;1.5.10: not found
+	修改build.gradle依赖库配置处
+	'org.slf4j:slf4j-api:1.5.10'
+	'ch.qos.logback:logback-core:0.9.18'
+	'ch.qos.logback:logback-classic:0.9.18'
+	'org.slf4j:jcl-over-slf4j:1.5.10'
+	'org.slf4j:log4j-over-slf4j:1.5.10'
+#3、编译
+	./vm-build.sh
+#4、结果
+	repo/bbb-common-message-0.8.jar
+#5、逆向
+	(1)root# find /var -name "bbb-common-message*"
+	/var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/lib/bbb-common-message-0.7.jar
+	(2)root# find /usr -name "bbb-common-message*"
+	/usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/bbb-common-message-0.7.jar
+
+##############
+#bbb-api-demo#
+##############
+#1、官方给出的操作步骤
+	#Steps:
+	gradle resolveDeps
+	gradle build
+	sudo rm -rf /var/lib/tomcat6/webapps/demo*
+	sudo cp build/libs/demo.war /var/lib/tomcat6/webapps/
+	sudo service tomcat6 restart
+#2、结果
+	build/libs/demo.war
+
+#########
+#bbb-lti#
+#########
+#1、官方给出的操作步骤
+	#To generate the war file
+	    grails clean
+	    grails war
+	sudo cp lti-0.1.war /var/lib/tomcat6/webapps/lti.war
+	sudo vi /var/lib/tomcat6/webapps/lti/WEB-INF/classes/lti.properties
+	#Edit the URL and Salt of the BigBlueButton server you are going to connect to
+	    bigbluebuttonURL=http://yourbigbluebuttonserver.com/bigbluebutton
+	    bigbluebuttonSalt=yoursalt
+	#Edit the LTI basic information
+	    ltiEndPoint=http://yourbigbluebuttonserver.com/lti/tool.xml
+	    ltiConsumers=demo:welcome,consumer1:secret1
+	#Restart tomcat
+	    sudo service tomcat6 restart
+#2、结果
+	lti-0.1.war
+#3、补充——nginx配置
+	cat lti.nginx >> /etc/nginx/sites-available/bigbluebutton
+
+###########
+#bbb-video#
+###########
+#1、又见依赖问题
+    - unresolved dependency: #logback-core;0.9.28: not found
+    - unresolved dependency: #logback-classic;0.9.28: not found
+    - unresolved dependency: #log4j-over-slf4j;1.6.1: not found
+    - unresolved dependency: #jcl-over-slf4j;1.6.1: not found
+    - unresolved dependency: #jul-to-slf4j;1.6.1: not found
+    - unresolved dependency: commons#commons-pool;1.5.6: not found
+    做相应修改：
+    'ch.qos.logback:logback-core:0.9.28'
+	'ch.qos.logback:logback-classic:0.9.28'
+	'org.slf4j:jcl-over-slf4j:1.6.1'
+	'org.slf4j:log4j-over-slf4j:1.6.1'
+	'org.slf4j:jul-to-slf4j:1.6.1'
+	'commons-pool:commons-pool:1.5.6'
+#2、编译
+	./vm-build.sh
+#1、结果
+	build/libs/video-0.7.war
+	直接部署到了——/usr/share/red5/webapps
+
+###########
+#bbb-voice#
+###########
+#1、该死的开发人员，又是依赖问题
+	'ch.qos.logback:logback-core:0.9.28'
+	'ch.qos.logback:logback-classic:0.9.28'
+	'org.slf4j:jcl-over-slf4j:1.6.1'
+	'org.slf4j:log4j-over-slf4j:1.6.1'
+	'org.slf4j:jul-to-slf4j:1.6.1'
+#2、编译
+	./vm-build.sh
+#3、结果
+	build/libs/sip-0.7.war
+	直接部署到了——/usr/share/red5/webapps
+
+######################
+#bbb-voice-conference#
+######################
+#1、配置项目，官方给出的提示：(涉及freeswtich和asterisk的配置，这里只关注freeswitch)
+	mv /usr/local/freeswitch/conf /usr/local/freeswitch/conf.dist
+	cp -a conf /usr/local/freeswitch/
+#2、so easy!备份freeswitch默认配置，然后把此项目下的conf作为freeswitch的最新配置。
+
+####################
+#bigbluebutton-apps#
+####################
+#1、编译
+	./vm-build.sh
+#2、结果
+	build/libs/bigbluebutton-0.8.war
+	直接部署到了——/usr/share/red5/webapps
+
+######################
+#bigbluebutton-client#
+######################
+
+
+
+
+######################
+#bigbluebutton-config#
+######################
+#1、一些配置，但是没有存放的说明？？？？？？？？？？？？？？？？？？？？？？？？？？？？
+#2、逆向
+	bigbluebutton-release——没有发现地方，全盘查找过。（参考的是0.71版本）
+	bin——/usr/local/bin
+	cron.daily——/etc/cron.daily
+	record——没有找到
+	slides——/etc/bigbluebutton/nopdfmark.ps，其他两个文件没有找到。
+	web——/var/www/bigbluebutton-default
+
+
