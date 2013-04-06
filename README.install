@@ -174,4 +174,3 @@ cp aopalliance-1.0.jar /usr/share/red5/lib/
 wget http://repo1.maven.org/maven2/org/springframework/spring-aop/3.0.0.RELEASE/spring-aop-3.0.0.RELEASE.jar
 cp spring-aop-3.0.0.RELEASE.jar /usr/share/red5/lib/
 
-
