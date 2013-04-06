@@ -1,0 +1,52 @@
+#源码编译依赖的组件
+apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev ant --yes
+
+#安装JDK
+apt-get install default-jdk -y
+
+#ruby源码安装
+wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p290.tar.gz
+tar xvzf ruby-1.9.2-p290.tar.gz
+cd ruby-1.9.2-p290
+./configure --prefix=/usr\
+            --program-suffix=1.9.2\
+            --with-ruby-version=1.9.2\
+            --disable-install-doc
+make
+checkinstall -D -y\
+                  --fstrans=no\
+                  --nodoc\
+                  --pkgname='ruby1.9.2'\
+                  --pkgversion='1.9.2-p290'\
+                  --provides='ruby'\
+                  --requires='libc6,libffi6,libgdbm3,libncurses5,libreadline5,openssl,libyaml-0-2,zlib1g'\
+                  --maintainer=brendan.ribera@gmail.com
+update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby1.9.2 500 \
+                         --slave /usr/bin/ri ri /usr/bin/ri1.9.2 \
+                         --slave /usr/bin/irb irb /usr/bin/irb1.9.2 \
+                         --slave /usr/bin/erb erb /usr/bin/erb1.9.2 \
+                         --slave /usr/bin/rdoc rdoc /usr/bin/rdoc1.9.2
+update-alternatives --install /usr/bin/gem gem /usr/bin/gem1.9.2 500
+
+#grails安装
+wget http://bigbluebutton.googlecode.com/files/grails-1.1.1.tar.gz
+tar -xvf grails-1.1.1.tar.gz 
+mv grails-1.1.1 /usr/share/grails
+
+#gradle安装
+wget http://bigbluebutton.googlecode.com/files/gradle-0.8.tar.gz
+tar -xvf gradle-0.8.tar.gz 
+mv gradle-0.8 /usr/share/gradle
+
+#groovy安装
+wget http://bigbluebutton.googlecode.com/files/groovy-1.6.5.tar.gz
+tar -xvf groovy-1.6.5.tar.gz 
+mv groovy-1.6.5 /usr/share/groovy
+
+#设置环境变量
+echo "export JAVA_HOME='/usr/lib/jvm/default-java'" >> ~/.bashrc
+echo "export GRAILS_HOME='/usr/share/grails'" >> ~/.bashrc
+echo "export GRADLE_HOME='/usr/share/gradle'" >> ~/.bashrc
+echo "export GROOVY_HOME='/usr/share/groovy'" >> ~/.bashrc
+echo "export PATH=\$PATH:\$GRAILS_HOME/bin:\$GRADLE_HOME/bin:\$GROOVY_HOME/bin:\$JAVA_HOME/bin" >> ~/.bashrc
+source ~/.bashrc
