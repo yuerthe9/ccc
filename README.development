@@ -27,6 +27,7 @@ update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby1.9.2 500 \
                          --slave /usr/bin/erb erb /usr/bin/erb1.9.2 \
                          --slave /usr/bin/rdoc rdoc /usr/bin/rdoc1.9.2
 update-alternatives --install /usr/bin/gem gem /usr/bin/gem1.9.2 500
+cd ..
 
 #grails°²×°
 wget http://bigbluebutton.googlecode.com/files/grails-1.1.1.tar.gz
