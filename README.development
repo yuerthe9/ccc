@@ -29,6 +29,14 @@ update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby1.9.2 500 \
 update-alternatives --install /usr/bin/gem gem /usr/bin/gem1.9.2 500
 cd ..
 
+#flex安装
+wget http://www.fayea.com/apache-mirror/flex/4.9.1/binaries/apache-flex-sdk-4.9.1-bin.tar.gz
+tar -xvf apache-flex-sdk-4.9.1-bin.tar.gz
+mv apache-flex-sdk-4.9.1-bin /usr/share/flex
+#$FLEX_HOME/frameworks:
+#ant thirdparty-downloads
+#ant thirdparty-clean
+
 #grails安装
 wget http://bigbluebutton.googlecode.com/files/grails-1.1.1.tar.gz
 tar -xvf grails-1.1.1.tar.gz 
@@ -46,8 +54,9 @@ mv groovy-1.6.5 /usr/share/groovy
 
 #设置环境变量
 echo "export JAVA_HOME='/usr/lib/jvm/default-java'" >> ~/.bashrc
+echo "export FLEX_HOME='/usr/share/flex'" >> ~/.bashrc
 echo "export GRAILS_HOME='/usr/share/grails'" >> ~/.bashrc
 echo "export GRADLE_HOME='/usr/share/gradle'" >> ~/.bashrc
 echo "export GROOVY_HOME='/usr/share/groovy'" >> ~/.bashrc
-echo "export PATH=\$PATH:\$GRAILS_HOME/bin:\$GRADLE_HOME/bin:\$GROOVY_HOME/bin:\$JAVA_HOME/bin" >> ~/.bashrc
+echo "export PATH=\$PATH:\$GRAILS_HOME/bin:\$GRADLE_HOME/bin:\$GROOVY_HOME/bin:\$JAVA_HOME/bin:\$FLEX_HOME/bin" >> ~/.bashrc
 source ~/.bashrc
