@@ -6,8 +6,6 @@ service tomcat6 start
 service nginx start
 
 
-
-
 service red5 stop
 service nginx stop
 service activemq stop
