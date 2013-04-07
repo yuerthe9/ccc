@@ -33,6 +33,10 @@ cd ..
 wget http://www.fayea.com/apache-mirror/flex/4.9.1/binaries/apache-flex-sdk-4.9.1-bin.tar.gz
 tar -xvf apache-flex-sdk-4.9.1-bin.tar.gz
 mv apache-flex-sdk-4.9.1-bin /usr/share/flex
+mkdir -p /usr/share/flex/frameworks/libs/player/11.1/
+wget http://fpdownload.macromedia.com/pub/flashplayer/updaters/11/playerglobal11_1.swc
+mv  playerglobal11_1.swc /usr/share/flex/frameworks/libs/player/11.1/playerglobal.swc
+#如果找不到playerglobal.swc库文件，修改/usr/share/flex/frameworks/flex-config.xml文件，把变量playerglobalHome替换为实际路径(以frameworks为起始目录，所以实际路径从libs开始)，因为我不知道playerglobalHome变量在哪里设置。其实我并不关心，我只关心能顺利编译。
 #$FLEX_HOME/frameworks:
 #ant thirdparty-downloads
 #ant thirdparty-clean
