@@ -120,20 +120,94 @@
 ######################
 #bigbluebutton-client#
 ######################
-
-
+#1、可能是人品不好，手动处理配置文件。
+	cp resources/config.xml.template src/conf/config.xml
+	cp resources/dev/join-mock.xml src/conf/join-mock.xml
+#2、编译
+	ant
+#3、结果
+	bin目录下的文件——www/bigbluebutton/client
+	config——nginx配置
 
 
 ######################
 #bigbluebutton-config#
 ######################
 #1、一些配置，但是没有存放的说明？？？？？？？？？？？？？？？？？？？？？？？？？？？？
-#2、逆向
-	bigbluebutton-release——没有发现地方，全盘查找过。（参考的是0.71版本）
+#2、逆向（参考的是0.71版本）
+	bigbluebutton-release——没有发现地方，全盘查找过。
 	bin——/usr/local/bin
 	cron.daily——/etc/cron.daily
 	record——没有找到
 	slides——/etc/bigbluebutton/nopdfmark.ps，其他两个文件没有找到。
 	web——/var/www/bigbluebutton-default
+
+
+###################
+#bigbluebutton-web#
+###################
+#1、编译
+	grails war
+#2、结果
+	bigbluebutton-0.70dev.war
+	位置在/usr/lib/tomcat6/webapps/
+	
+
+###########
+#deskshare#
+###########
+#1、xxxx依赖，我要骂人了。
+    - unresolved dependency: #logback-core;0.9.28: not found
+    - unresolved dependency: #logback-classic;0.9.28: not found
+    - unresolved dependency: #log4j-over-slf4j;1.6.1: not found
+    - unresolved dependency: #jcl-over-slf4j;1.6.1: not found
+    - unresolved dependency: #jul-to-slf4j;1.6.1: not found
+    除了根目录的build.gradle还有app下的build.gradle，我勒个去！！！
+#2、编译
+	gradle assemble
+#3、结果
+	app/build/libs/bbb-deskshare-app-0.71.war和app-0.70.jar
+	applet/build/libs/bbb-deskshare-applet-0.8.jar
+	common/build/libs/bbb-deskshare-common-0.8.jar
+#4、逆向
+	bbb-deskshare-app-0.71.war——部署在red5下
+	app-0.70.jar——未知
+	bbb-deskshare-applet-0.8.jar——/var/www/bigbluebutton/client/
+	bbb-deskshare-common-0.8.jar——/usr/share/red5/webapps/deskshare/
+	
+
+################
+#esl-client-bbb#
+################
+#1、依赖。。。。。。。。。。
+    - unresolved dependency: #slf4j-api;1.6.1: not found
+    - unresolved dependency: #logback-core;0.9.18: not found
+    - unresolved dependency: #logback-classic;0.9.18: not found
+    - unresolved dependency: #jcl-over-slf4j;1.5.10: not found
+    - unresolved dependency: #log4j-over-slf4j;1.5.10:
+#2、编译org.freeswitch.esl.client目录
+	gradle assemble
+#3、结果
+	org.freeswitch.esl.client/build/libs/fs-esl-client-0.8.2.jar
+#4、位置
+	fs-esl-client-0.8.2.jar——未知
+	*怀疑被其他项目引用，因为它是单独的jar包。
+
+
+######
+#labs#
+######
+#1、属于实验性质的模块，可以关注。
+
+
+#####################
+#record-and-playback#
+#####################
+#1、安装
+	deploy.sh
+#2、单独安装matterhorn（暂时不知道这是什么东西）
+	matterhorn-install.sh
+	#记得查看README，同时根据实际情况修改matterhorn-install.sh安装脚本。
+
 
 
