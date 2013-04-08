@@ -12,3 +12,12 @@ git push origin master
 3、文件更改
 git commit -m "a"
 同时执行操作2。
+4、文件删除
+git rm a.txt
+然后同步远程仓库
+5、文件改名
+git mv file_from file_to
+然后同步远程仓库
+6、查看远程仓库
+git remote -v
+
