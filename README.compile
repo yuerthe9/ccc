@@ -133,13 +133,16 @@
 ######################
 #bigbluebutton-config#
 ######################
-#1、一些配置，但是没有存放的说明？？？？？？？？？？？？？？？？？？？？？？？？？？？？
-#2、逆向（参考的是0.71版本）
-	bigbluebutton-release——没有发现地方，全盘查找过。
+#1、一些配置，但是没有存放的说明？？？？？？？？？？？？
+#2、逆向（参考的是0.8版本）
+	bigbluebutton-release——/etc/bigbluebutton/
 	bin——/usr/local/bin
 	cron.daily——/etc/cron.daily
 	record——没有找到
-	slides——/etc/bigbluebutton/nopdfmark.ps，其他两个文件没有找到。
+	slides:
+		nopdfmark.ps——/etc/bigbluebutton/nopdfmark.ps
+		blank-slide.swf——/var/bigbluebutton/blank/blank-slide.swf
+		blank-thumb.png——/var/bigbluebutton/blank/blank-thumb.png
 	web——/var/www/bigbluebutton-default
 
 
@@ -190,8 +193,7 @@
 #3、结果
 	org.freeswitch.esl.client/build/libs/fs-esl-client-0.8.2.jar
 #4、位置
-	fs-esl-client-0.8.2.jar——未知
-	*怀疑被其他项目引用，因为它是单独的jar包。
+	fs-esl-client-0.8.2.jar——/usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/fs-esl-client-0.8.2.jar
 
 
 ######
