@@ -1,0 +1,24 @@
+#freeswitch配置
+mv /usr/local/freeswitch/conf /usr/local/freeswitch/conf.dist
+cp -a bigbluebutton/bbb-voice-conference/config/freeswitch/conf /usr/local/freeswitch/
+
+#red5配置
+#video和sip都还是0.7所以不用更新
+#deskshare是0.71不用更新
+#只需要更新bigbluebutton即可。
+#同时更新red5为1.0.0版本。
+cd lib
+wget http://red5.org/downloads/red5/1_0/red5-1.0.0.tar.gz
+tar xvf red5-1.0.0.tar.gz
+mv red5-1.0.0-build-jenkins-red5-226 /usr/share/red5
+adduser --system --home /usr/share/red5 --no-create-home --group --disabled-password --shell /bin/false red5
+chown -R root:root /usr/share/red5
+chown -R red5:adm /usr/share/red5/log
+chown -R red5:adm /usr/share/red5/work
+chmod 755 /usr/share/red5/log
+chgrp red5 /usr/share/red5/webapps
+chmod 775 /usr/share/red5/webapps
+#编译部署bigbluebutton0.8
+bigbluebutton/bigbluebutton-apps/vm-build.sh
+
+
