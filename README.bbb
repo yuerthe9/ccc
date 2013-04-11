@@ -6,3 +6,18 @@ BBB-server 使用java/grails/scala
     注释调用:<param name="moh-sound" value="$${hold_music}"/>
     重启BBB即可，此方法为0.8版本。
 
+打开client调试窗口：
+	编辑/var/www/bigbluebutton/client/conf/config.xml
+	修改showLogButton=true
+
+freeswitch配置
+	拨号计划：
+		/usr/local/freeswitch/conf/dialplan/public.xml
+	用户配置:
+		/usr/local/freeswitch/conf/directory/default/bbbuser.xml
+		user:bbbuser
+		passwd:secret
+	默认密码:
+		/usr/local/freeswitch/conf/vars.xml
+		default-passwd:1234
+
