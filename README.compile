@@ -60,7 +60,7 @@
 #2、结果
 	lti-0.1.war
 #3、补充——nginx配置
-	cat lti.nginx >> /etc/nginx/sites-available/bigbluebutton
+	cp lti.nginx /etc/bigbluebutton/nginx/
 
 ###########
 #bbb-video#
@@ -212,4 +212,41 @@
 	#记得查看README，同时根据实际情况修改matterhorn-install.sh安装脚本。
 
 
+#############
+#web-polling#
+#############
+#1、已经生成好的应用，只要把war复制到tomcat，nginx配置追加到bigbluebutton即可。
+	cp p.war /var/lib/tomcat6/webapps/
+	cp p.nginx /etc/bigbluebutton/nginx/
+
+
+##################
+#BBB-HTML5-Client#
+##################
+## 1. Install [Node.js](http://www.nodejs.org)
+apt-get install nodejs npm
+
+## 2. Install [Redis](http://redis.io/download/)
+apt-get install redis-server
+
+## 3. Clone this repo
+git clone https://github.com/ryanseys/bbb-html5-client.git
+```
+## 4. Install node dependencies
+```
+cd bbb-html5-client
+npm install
+
+## 5. Install [ImageMagick](http://www.imagemagick.org/script/binary-releases.php)
+apt-get install imagemagick
+
+## 6. Run the Redis server
+```
+redis-server
+```
+
+## 7. Run the BBB server
+```
+cd bbb-html5-client
+node app.js
 
