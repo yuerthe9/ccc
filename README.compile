@@ -124,6 +124,7 @@
 	cp resources/config.xml.template src/conf/config.xml
 	cp resources/dev/join-mock.xml src/conf/join-mock.xml
 #2、编译
+	ant locales
 	ant
 #3、结果
 	bin目录下的文件——www/bigbluebutton/client
