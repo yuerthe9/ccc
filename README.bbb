@@ -8,7 +8,7 @@ BBB-server 使用java/grails/scala
 
 打开client调试窗口：
 	编辑/var/www/bigbluebutton/client/conf/config.xml
-	修改showLogButton=true
+	添加配置<debug showDebugWindow="true" />
 
 freeswitch配置
 	拨号计划：
@@ -21,3 +21,10 @@ freeswitch配置
 		/usr/local/freeswitch/conf/vars.xml
 		default-passwd:1234
 
+修改会议室footer：
+	vi bigbluebutton-client/src/org/bigbluebutton/main/views/MainApplicationShell.mxml
+	在311行看到如下内容:
+	<mx:Label text="{ResourceUtil.getInstance().getString('bbb.mainshell.copyrightLabel2',[appVersion])}" id="copyrightLabel2"/>
+	假如我要加一个提示文本——“hi，你好”，做如下修改。
+	<mx:Label text="{ResourceUtil.getInstance().getString('bbb.mainshell.copyrightLabel2',[appVersion]) + 'hi，你好'}" id="copyrightLabel2"/>
+	
