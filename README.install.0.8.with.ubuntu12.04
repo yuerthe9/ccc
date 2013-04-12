@@ -1,0 +1,399 @@
+#夏大的ubuntu源，速度可以：http://debian.ustc.edu.cn/ubuntu/
+
+echo "export LANGUAGE='en_US:en'
+#export LC_ALL=(unset)
+export LC_PAPER='en_US.UTF-8'
+export LC_ADDRESS='en_US.UTF-8'
+export LC_MONETARY='en_US.UTF-8'
+export LC_NUMERIC='en_US.UTF-8'
+export LC_TELEPHONE='en_US.UTF-8'
+export LC_IDENTIFICATION='en_US.UTF-8'
+export LC_MEASUREMENT='en_US.UTF-8'
+export LC_TIME='en_US.UTF-8'
+export LC_NAME='en_US.UTF-8'
+export LANG='en_US.UTF-8'" >> ~/.bashrc
+
+source ~/.bashrc
+
+apt-get update
+apt-get upgrade -y
+apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev ant --yes
+
+apt-get install tomcat6 -y
+
+#安装swftools依赖的库gif、jpeg、pdf
+apt-get install libgif-dev libjpeg-dev libfreetype6 libfreetype6-dev -y
+wget http://www.swftools.org/swftools-0.9.2.tar.gz
+tar -xvf swftools-0.9.2.tar.gz
+cd swftools-0.9.2
+./configure>/dev/null&&make>/dev/null&& make install>/dev/null
+
+cd ..
+apt-get install imagemagick -y
+apt-get install nginx -y
+
+apt-get install jsvc -y
+wget http://apache.sunsite.ualberta.ca/activemq/apache-activemq/5.4.3/apache-activemq-5.4.3-bin.tar.gz
+tar zxvf apache-activemq-5.4.3-bin.tar.gz
+mv apache-activemq-5.4.3 /usr/share/activemq
+chown -R root:root /usr/share/activemq
+
+apt-get install openoffice.org -y
+
+apt-get -y install build-essential automake autoconf git-core wget libtool
+apt-get -y install libncurses5-dev libtiff-dev libjpeg-dev zlib1g-dev
+git clone git://git.freeswitch.org/freeswitch.git
+cd freeswitch && ./bootstrap.sh&&./configure&&make install &&make sounds-install&&make moh-install
+cp debian/freeswitch-sysvinit.freeswitch.init /etc/init.d/freeswitch
+#sed debian/freeswitch-sysvinit.freeswitch.init -e s,opt,usr/local, >/etc/init.d/freeswitch
+addgroup freeswitch
+adduser --disabled-password  --quiet --system --home /usr/local/freeswitch --gecos "FreeSwitch Voice Platform" --ingroup freeswitch freeswitch
+mkdir /var/lib/freeswitch
+chown -R freeswitch:freeswitch /var/lib/freeswitch
+chmod 755 /etc/init.d/freeswitch
+update-rc.d -f freeswitch defaults
+cp debian/freeswitch-sysvinit.freeswitch.default /etc/default/freeswitch
+adduser freeswitch audio
+chmod -R o-rwx /usr/local/freeswitch/
+ln -sf /usr/local/freeswitch/bin/freeswitch /usr/bin/
+ln -sf /usr/local/freeswitch/bin/fs_cli /usr/bin/
+cd ..
+#sed -i 's/FREESWITCH_ENABLED=\"false\"/FREESWITCH_ENABLED=\"true\"/g' /etc/default/freeswitch
+echo "FREESWITCH_ENABLED=\"true\"">> /etc/default/freeswitch
+#freeswitch配置
+mv /usr/local/freeswitch/conf /usr/local/freeswitch/conf.dist
+cp -a bigbluebutton/bbb-voice-conference/config/freeswitch/conf /usr/local/freeswitch/
+chown -R freeswitch:freeswitch /usr/local/freeswitch/
+chmod -R 755 /usr/local/freeswitch/conf
+#9123端口没有启用的问题：
+#这样还是没有用:
+	#把/usr/share/red5/webapps/deskshare/WEB-INF/deskshare.properties中，9123端口设置行等号两边的空格去掉。
+	#/sbin/iptables -A INPUT -p tcp --dport 1935 -j ACCEPT 
+	#/sbin/iptables -A INPUT -p tcp --dport 9123 -j ACCEPT 
+#不知道是不是有关系，装了ffmpeg后居然启用了。
+
+
+mkdir /var/log/bigbluebutton
+mkdir -p /var/bigbluebutton/published
+mkdir -p /var/bigbluebutton/unpublished
+mkdir -p /var/bigbluebutton/recording/status/recorded	
+mkdir -p /usr/local/bigbluebutton/core/lib/
+mkdir -p /usr/local/bigbluebutton/core/scripts
+mkdir -p /etc/bigbluebutton/nginx
+mkdir -p /var/bigbluebutton/recording/publish/presentation
+mkdir -p /var/bigbluebutton/recording/publish/slides
+mkdir -p /var/bigbluebutton/published/presentation
+mkdir -p /var/bigbluebutton/published/slides
+mkdir -p /var/bigbluebutton/recording/raw
+chown -R tomcat6:adm /var/bigbluebutton
+chown -R tomcat6:adm /var/log/bigbluebutton
+chmod -R 777 /var/bigbluebutton
+chmod -R 777 /var/log/bigbluebutton
+touch /var/log/bigbluebutton/bbb-web.log
+chown -R tomcat6:adm /var/log/bigbluebutton/bbb-web.log
+
+#red5配置
+#需要安装redis-server
+apt-get install redis-server
+cd lib
+wget http://red5.org/downloads/red5/1_0/red5-1.0.0.tar.gz
+tar xvf red5-1.0.0.tar.gz
+mv red5-1.0.0-build-jenkins-red5-226 /usr/share/red5
+adduser --system --home /usr/share/red5 --no-create-home --group --disabled-password --shell /bin/false red5
+chown -R root:root /usr/share/red5
+chown -R red5:adm /usr/share/red5/log
+chown -R red5:adm /usr/share/red5/work
+chmod 755 /usr/share/red5/log
+chgrp red5 /usr/share/red5/webapps
+chmod 775 /usr/share/red5/webapps
+cd /usr/share/red5/lib/
+wget http://repo1.maven.org/maven2/commons-fileupload/commons-fileupload/1.3/commons-fileupload-1.3.jar
+
+
+
+cd ~
+#安装ffmpeg
+cd lib
+git clone http://git.chromium.org/webm/libvpx.git
+cd libvpx
+sudo ./configure
+sudo make
+sudo make install
+cd ..
+wget http://ffmpeg.org/releases/ffmpeg-0.11.2.tar.gz
+sudo tar -xvzf ffmpeg-0.11.2.tar.gz
+cd ffmpeg-0.11.2
+sudo ./configure  --enable-version3 --enable-postproc  --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libtheora --enable-libvorbis  --enable-libvpx
+sudo make
+sudo checkinstall --pkgname=ffmpeg --pkgversion="5:$(./version.sh)" --backup=no --deldoc=yes --default
+
+
+
+
+##代码编译参考development和compile
+git clone git://github.com/bigbluebutton/bigbluebutton.git
+
+cd bigbluebutton
+###########################################################################################
+###### 编译源代码进行部署
+###########################################################################################
+##video
+	#2、编译
+		cd bbb-video/
+		./vm-build.sh
+	#1、结果
+		build/libs/video-0.7.war
+		直接部署到了——/usr/share/red5/webapps
+
+##sip
+	#2、编译
+		cd bbb-voice
+		./vm-build.sh
+	#3、结果
+		build/libs/sip-0.7.war
+		直接部署到了——/usr/share/red5/webapps
+
+##上述已经处理了freeswitch的配置问题。
+##freeswitch配置，源代码在——bbb-voice-conference
+	#1、配置项目，官方给出的提示：(涉及freeswtich和asterisk的配置，这里只关注freeswitch)
+		#mv /usr/local/freeswitch/conf /usr/local/freeswitch/conf.dist
+		#cp -a conf /usr/local/freeswitch/
+	#2、so easy!备份freeswitch默认配置，然后把此项目下的conf作为freeswitch的最新配置。
+	lsof -i :9123#查看端口是否在使用
+
+##bigbluebutton-red5，源代码在bigbluebutton-apps目录
+	#1、编译
+		cd bigbluebutton-apps/
+		./vm-build.sh
+	#2、结果
+		build/libs/bigbluebutton-0.8.war
+		直接部署到了——/usr/share/red5/webapps
+
+
+
+##deskshare
+	#2、编译
+		cd deskshare/
+		gradle assemble
+	#3、结果
+		app/build/libs/bbb-deskshare-app-0.71.war和app-0.70.jar
+		applet/build/libs/bbb-deskshare-applet-0.8.jar
+		common/build/libs/bbb-deskshare-common-0.8.jar
+		
+		cp -r  app/build/deskshare/ /usr/share/red5/webapps/
+	#4、逆向
+		bbb-deskshare-app-0.71.war——部署在red5下
+
+##bigbluebutton-tomcat，源代码在bigbluebutton-web目录
+	#1、编译
+		cd bigbluebutton-web/
+		gradle resolveDeps
+		ant war
+	#2、结果
+		bigbluebutton-0.70dev.war
+		位置在/usr/lib/tomcat6/webapps/
+		unzip -x bigbluebutton-0.70dev.war  -d /var/lib/tomcat6/webapps/bigbluebutton
+	#编辑/var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+	mkdir /var/lib/tomcat6/webapps/bigbluebutton/demo
+	#设置swftools路径	
+	#设置uuid:securitySalt=a106c6cff65f94ad5c846df9e230b480
+	#设置openoffice脚本
+		cp scripts/sofficed.sh /etc/init.d/bbb-open-office
+		update-rc.d -f bbb-open-office defaults
+
+#录制视频，源代码在record-and-playback目录
+	cd record-and-playback
+	./deploy.sh
+	##god部署,源代码在record-and-playback/core目录
+	#对应于/etc/init.d/bbb-record-core这个服务
+	#安装god
+		gem install god
+	#部署
+	1. Copy god dir to /etc/bigbluebutton
+		            cp -R core/god/god /etc/bigbluebutton/
+	2. Copy initd.god as to /etc/init.d/god
+		            sudo cp core/god/initd.god /etc/init.d/god
+		            chmod +x /etc/init.d/god
+		            sudo /usr/sbin/update-rc.d -f god defaults
+	3. Start god
+		sudo /etc/init.d/god start
+
+#设置bigbluebutton-default，源代码在bigbluebutton-config目录
+	cd bigbluebutton-config
+	#把web下的文件目录都复制过来。
+	mkdir -p /var/www/bigbluebutton-default
+	cp -r web/* /var/www/bigbluebutton-default/
+	#复制配置文件
+	cp bigbluebutton-release /etc/bigbluebutton/
+	#把bigbluebutton-config/bin下的文件目录都复制过来。
+	cp bin/* /usr/local/bin
+	chmod a+x /usr/local/bin/bbb-conf 
+	sed -i 's,opt/,usr/local/,' /usr/local/bin/bbb-conf 
+	#处理文件nopdfmark.ps——
+		mkdir -p /etc/bigbluebutton
+		cp slides/nopdfmark.ps /etc/bigbluebutton/
+	#处理文件blank-slide.swf——
+		mkdir -p /var/bigbluebutton/blank/
+		cp slides/blank-slide.swf /var/bigbluebutton/blank/
+	#处理文件blank-thumb.png——
+		cp slides/blank-thumb.png /var/bigbluebutton/blank/
+
+#设置bigbluebutton-client，源代码为[bigbluebutton-client]目录
+	cd bigbluebutton-client
+	mkdir -p /var/www/bigbluebutton/client
+	cp -r bin/* /var/www/bigbluebutton/client
+	cp config/bigbluebutton.nginx /etc/nginx/sites-available/bigbluebutton
+	ln -s /etc/nginx/sites-available/bigbluebutton /etc/nginx/sites-enabled/bigbluebutton
+
+#demo
+	cd bbb-api-demo/
+	gradle resolveDeps
+	gradle build
+	sudo rm -rf /var/lib/tomcat6/webapps/demo*
+	sudo cp build/libs/demo.war /var/lib/tomcat6/webapps/
+	sudo service tomcat6 restart
+	#nginx配置
+	cp demo.nginx /etc/bigbluebutton/nginx/
+
+	echo "<%!
+	// This is the security salt that must match the value set in the BigBlueButton server
+	String salt = \"a106c6cff65f94ad5c846df9e230b480\";
+	// This is the URL for the BigBlueButton server
+	String BigBlueButtonURL = \"http://42.120.7.154/bigbluebutton/\";//this is ip for remote
+	%>" > /var/lib/tomcat6/webapps/demo/bbb_api_conf.jsp
+
+
+#bbb-common-message
+	#1、修改build.gradle
+		flatDir name: 'fileRepo', dirs: "/home/firstuser/dev/repo"
+		to
+		flatDir name: 'fileRepo', dirs: "repo"
+	#3、编译
+		./vm-build.sh
+	#4、结果
+		repo/bbb-common-message-0.8.jar
+	#5、部署
+		cp repo/bbb-common-message-0.8.jar /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/lib/
+		cp repo/bbb-common-message-0.8.jar /usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/
+
+
+#bbb-lti
+	#1、官方给出的操作步骤
+		#To generate the war file
+			grails clean
+			grails war
+		sudo cp lti-0.1.war /var/lib/tomcat6/webapps/lti.war
+		sudo vi /var/lib/tomcat6/webapps/lti/WEB-INF/classes/lti.properties
+		#Edit the URL and Salt of the BigBlueButton server you are going to connect to
+			bigbluebuttonURL=http://yourbigbluebuttonserver.com/bigbluebutton
+			bigbluebuttonSalt=yoursalt
+		#Edit the LTI basic information
+			ltiEndPoint=http://yourbigbluebuttonserver.com/lti/tool.xml
+			ltiConsumers=demo:welcome,consumer1:secret1
+		#Restart tomcat
+			sudo service tomcat6 restart
+	#3、补充——nginx配置
+		cp lti.nginx /etc/bigbluebutton/nginx/
+
+
+#web-polling
+	#1、已经生成好的应用，只要把war复制到tomcat，nginx配置追加到bigbluebutton即可。
+	cp p.war /var/lib/tomcat6/webapps/
+	cp p.nginx /etc/bigbluebutton/nginx/
+
+
+#设置nginx配置
+	vi /etc/bigbluebutton/nginx/client.nginx
+	vi /etc/bigbluebutton/nginx/web.nginx
+	
+##设置BBB的ip
+	bbb-conf --setip xxx
+
+##############################################################################
+#附表：
+	##/etc/bigbluebutton/nginx/client.nginx
+        # BigBlueButton.html is here so we can expire it every 1 minute to
+        # prevent caching.
+        location /client/BigBlueButton.html {
+                root    /var/www/bigbluebutton;
+                index  index.html index.htm;
+                expires 1m;
+        }
+
+        # BigBlueButton Flash client.
+        location /client {
+                root    /var/www/bigbluebutton;
+                index  index.html index.htm;
+        }
+        
+	##/etc/bigbluebutton/nginx/slides.nginx
+        location /playback/slides {
+                root    /var/bigbluebutton;
+                index  index.html index.htm;
+        }
+
+        location /slides {
+                root    /var/bigbluebutton/published;
+                index  index.html index.htm;
+        }
+        
+	##/etc/bigbluebutton/nginx/web.nginx
+         # Handle request to bbb-web running within Tomcat.  This is for
+         # the BBB-API and Presentation.
+       location /bigbluebutton {
+           proxy_pass         http://127.0.0.1:8080;
+           proxy_redirect     default;
+           proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+
+        # Allow 30M uploaded presentation document.
+           client_max_body_size       30m;
+           client_body_buffer_size    128k;
+
+           proxy_connect_timeout      90;
+           proxy_send_timeout         90;
+           proxy_read_timeout         90;
+
+           proxy_buffer_size          4k;
+           proxy_buffers              4 32k;
+           proxy_busy_buffers_size    64k;
+           proxy_temp_file_write_size 64k;
+
+           include    fastcgi_params;
+       }
+       
+	##/etc/bigbluebutton/nginx/demo.nginx
+         # Forward request to /demo to tomcat.  This is for
+         # the BigBlueButton api demos.
+       location /demo {
+           proxy_pass         http://127.0.0.1:8080;
+           proxy_redirect     default;
+           proxy_set_header   X-Forwarded-For   $proxy_add_x_forwarded_for;
+
+        # Allow 30M uploaded presentation document.
+           client_max_body_size       30m;
+           client_body_buffer_size    128k;
+
+           proxy_connect_timeout      90;
+           proxy_send_timeout         90;
+           proxy_read_timeout         90;
+
+           proxy_buffer_size          4k;
+           proxy_buffers              4 32k;
+           proxy_busy_buffers_size    64k;
+           proxy_temp_file_write_size 64k;
+
+           include    fastcgi_params;
+       }
+
+##服务命令
+	service god start
+	service freeswitch restart
+	service tomcat6 restart
+	service nginx restart
+	service bbb-open-office start
+	
+	cd /usr/share/red5/
+	sudo -u red5 ./red5.sh
+	
+	
+	
