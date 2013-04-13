@@ -16,19 +16,17 @@ export LANG='en_US.UTF-8'" >> ~/.bashrc
 source ~/.bashrc
 
 apt-get update
-apt-get upgrade -y
+apt-get dist-upgrade -y
 apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev ant --yes
 
 apt-get install tomcat6 -y
 #安装redis-server
 apt-get install redis-server
+apt-get install imagemagick -y
+apt-get install nginx -y
 
-#安装swftools依赖的库gif、jpeg、pdf
-apt-get install libgif-dev libjpeg-dev libfreetype6 libfreetype6-dev -y
-wget http://www.swftools.org/swftools-0.9.2.tar.gz
-tar -xvf swftools-0.9.2.tar.gz
-cd swftools-0.9.2
-./configure>/dev/null&&make>/dev/null&& make install>/dev/null
+apt-get install openoffice.org -y
+
 
 #安装ffmpeg
 cd lib
@@ -45,18 +43,20 @@ sudo ./configure  --enable-version3 --enable-postproc  --enable-libopencore-amrn
 sudo make
 sudo checkinstall --pkgname=ffmpeg --pkgversion="5:$(./version.sh)" --backup=no --deldoc=yes --default
 
+#安装swftools依赖的库gif、jpeg、pdf
+apt-get install libgif-dev libjpeg-dev libfreetype6 libfreetype6-dev -y
+wget http://www.swftools.org/swftools-0.9.2.tar.gz
+tar -xvf swftools-0.9.2.tar.gz
+cd swftools-0.9.2
+./configure>/dev/null&&make>/dev/null&& make install>/dev/null
 
 cd ..
-apt-get install imagemagick -y
-apt-get install nginx -y
 
 apt-get install jsvc -y
 wget http://apache.sunsite.ualberta.ca/activemq/apache-activemq/5.4.3/apache-activemq-5.4.3-bin.tar.gz
 tar zxvf apache-activemq-5.4.3-bin.tar.gz
 mv apache-activemq-5.4.3 /usr/share/activemq
 chown -R root:root /usr/share/activemq
-
-apt-get install openoffice.org -y
 
 apt-get -y install build-essential automake autoconf git-core wget libtool
 apt-get -y install libncurses5-dev libtiff-dev libjpeg-dev zlib1g-dev
