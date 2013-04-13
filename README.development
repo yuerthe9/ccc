@@ -1,10 +1,10 @@
-#Ô´Âë±àÒëÒÀÀµµÄ×é¼þ
+#æºç ç¼–è¯‘ä¾èµ–çš„ç»„ä»¶
 apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev ant --yes
 
-#°²×°JDK
+#å®‰è£…JDK
 apt-get install default-jdk -y
 
-#rubyÔ´Âë°²×°
+#rubyæºç å®‰è£…
 wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.2-p290.tar.gz
 tar xvzf ruby-1.9.2-p290.tar.gz
 cd ruby-1.9.2-p290
@@ -29,42 +29,50 @@ update-alternatives --install /usr/bin/ruby ruby /usr/bin/ruby1.9.2 500 \
 update-alternatives --install /usr/bin/gem gem /usr/bin/gem1.9.2 500
 cd ..
 
-#flex°²×°
-wget http://www.fayea.com/apache-mirror/flex/4.9.1/binaries/apache-flex-sdk-4.9.1-bin.tar.gz
-tar -xvf apache-flex-sdk-4.9.1-bin.tar.gz
-mv apache-flex-sdk-4.9.1-bin /usr/share/flex
-mkdir -p /usr/share/flex/frameworks/libs/player/11.1/
-wget http://fpdownload.macromedia.com/pub/flashplayer/updaters/11/playerglobal11_1.swc
-mv  playerglobal11_1.swc /usr/share/flex/frameworks/libs/player/11.1/playerglobal.swc
+#flexå®‰è£…
+#4.9.1å®‰è£…ä¹‹åŽæœ‰é—®é¢˜---ReferenceError: Error #1069ï¼Œæ‰€ä»¥æœ€ç»ˆå®‰è£…çš„æ˜¯4.5.0ã€‚
+#å®¢æˆ·ç«¯çš„ç‰ˆæœ¬è¦æ±‚æ˜¯11.2å¹¶éž11.1ã€‚
+#wget http://www.fayea.com/apache-mirror/flex/4.9.1/binaries/apache-flex-sdk-4.9.1-bin.tar.gz
+#tar -xvf apache-flex-sdk-4.9.1-bin.tar.gz
+#mv apache-flex-sdk-4.9.1-bin /usr/share/flex
+#mkdir -p /usr/share/flex/frameworks/libs/player/11.1/
+#wget http://fpdownload.macromedia.com/pub/flashplayer/updaters/11/playerglobal11_1.swc
+#mv  playerglobal11_1.swc /usr/share/flex/frameworks/libs/player/11.1/playerglobal.swc
+############
+##11.2çš„å¤„ç†#
 ###########
-#11.2µÄ´¦Àí#
-###########
-#mkdir -p flex-4.5.0.20967/frameworks/libs/player/11.2
-#cd flex-4.5.0.20967/frameworks/libs/player/11.2
-#wget http://download.macromedia.com/get/flashplayer/updaters/11/playerglobal11_2.swc
-#mv -f playerglobal11_2.swc playerglobal.swc
+##mkdir -p flex-4.5.0.20967/frameworks/libs/player/11.2
+##cd flex-4.5.0.20967/frameworks/libs/player/11.2
+##wget http://download.macromedia.com/get/flashplayer/updaters/11/playerglobal11_2.swc
+##mv -f playerglobal11_2.swc playerglobal.swc
+##å¦‚æžœæ‰¾ä¸åˆ°playerglobal.swcåº“æ–‡ä»¶ï¼Œä¿®æ”¹/usr/share/flex/frameworks/flex-config.xmlæ–‡ä»¶ï¼ŒæŠŠå˜é‡playerglobalHomeæ›¿æ¢ä¸ºå®žé™…è·¯å¾„(ä»¥frameworksä¸ºèµ·å§‹ç›®å½•ï¼Œæ‰€ä»¥å®žé™…è·¯å¾„ä»Žlibså¼€å§‹)ï¼Œå› ä¸ºæˆ‘ä¸çŸ¥é“playerglobalHomeå˜é‡åœ¨å“ªé‡Œè®¾ç½®ã€‚å…¶å®žæˆ‘å¹¶ä¸å…³å¿ƒï¼Œæˆ‘åªå…³å¿ƒèƒ½é¡ºåˆ©ç¼–è¯‘ã€‚
+##$FLEX_HOME/frameworks:
+##ant thirdparty-downloads
+##ant thirdparty-clean
+wget http://fpdownload.adobe.com/pub/flex/sdk/builds/flex4.5/flex_sdk_4.5.0.20967_mpl.zip
+unzip flex_sdk_4.5.0.20967_mpl.zip -d /usr/share/flex/
+mkdir /usr/share/flex/frameworks/libs/player/11.2
+cd /usr/share/flex/frameworks/libs/player/11.2/
+wget http://download.macromedia.com/get/flashplayer/updaters/11/playerglobal11_2.swc
+mv playerglobal11_2.swc playerglobal.swc
 
-#Èç¹ûÕÒ²»µ½playerglobal.swc¿âÎÄ¼þ£¬ÐÞ¸Ä/usr/share/flex/frameworks/flex-config.xmlÎÄ¼þ£¬°Ñ±äÁ¿playerglobalHomeÌæ»»ÎªÊµ¼ÊÂ·¾¶(ÒÔframeworksÎªÆðÊ¼Ä¿Â¼£¬ËùÒÔÊµ¼ÊÂ·¾¶´Ólibs¿ªÊ¼)£¬ÒòÎªÎÒ²»ÖªµÀplayerglobalHome±äÁ¿ÔÚÄÄÀïÉèÖÃ¡£ÆäÊµÎÒ²¢²»¹ØÐÄ£¬ÎÒÖ»¹ØÐÄÄÜË³Àû±àÒë¡£
-#$FLEX_HOME/frameworks:
-#ant thirdparty-downloads
-#ant thirdparty-clean
 
-#grails°²×°
+#grailså®‰è£…
 wget http://bigbluebutton.googlecode.com/files/grails-1.1.1.tar.gz
 tar -xvf grails-1.1.1.tar.gz 
 mv grails-1.1.1 /usr/share/grails
 
-#gradle°²×°
+#gradleå®‰è£…
 wget http://bigbluebutton.googlecode.com/files/gradle-0.8.tar.gz
 tar -xvf gradle-0.8.tar.gz 
 mv gradle-0.8 /usr/share/gradle
 
-#groovy°²×°
+#groovyå®‰è£…
 wget http://bigbluebutton.googlecode.com/files/groovy-1.6.5.tar.gz
 tar -xvf groovy-1.6.5.tar.gz 
 mv groovy-1.6.5 /usr/share/groovy
 
-#ÉèÖÃ»·¾³±äÁ¿
+#è®¾ç½®çŽ¯å¢ƒå˜é‡
 echo "export JAVA_HOME='/usr/lib/jvm/default-java'" >> ~/.bashrc
 echo "export FLEX_HOME='/usr/share/flex'" >> ~/.bashrc
 echo "export GRAILS_HOME='/usr/share/grails'" >> ~/.bashrc
