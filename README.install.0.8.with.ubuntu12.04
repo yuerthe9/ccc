@@ -140,43 +140,49 @@ cd bigbluebutton
 ###### 编译源代码进行部署
 ###########################################################################################
 ##video
-		cd bbb-video/
-		./vm-build.sh
-		build/libs/video-0.7.war
-		直接部署到了——/usr/share/red5/webapps
+	cd bbb-video/
+	./vm-build.sh
 
 ##sip
-		cd bbb-voice
-		./vm-build.sh
-		build/libs/sip-0.7.war
-		直接部署到了——/usr/share/red5/webapps
+	cd bbb-voice
+	./vm-build.sh
 
 #lsof -i :9123#查看端口是否在使用
 
 ##bigbluebutton-red5，源代码在bigbluebutton-apps目录
-		cd bigbluebutton-apps/
-		./vm-build.sh
-		build/libs/bigbluebutton-0.8.war
-		直接部署到了——/usr/share/red5/webapps
-
-
+	cd bigbluebutton-apps/
+	./vm-build.sh
 
 ##deskshare
-		cd deskshare/
-		gradle assemble
-		cp -r  app/build/deskshare/ /usr/share/red5/webapps/
+	cd deskshare/
+	gradle resolveDeps
+
+	cd common
+	gradle clean
+	gradle jar
+
+	cd ../applet
+	gradle jar
+	ant create-signing-key
+	ant sign-jar
+	
+	#按照本文的安装顺序，下列语句将报错，所以将下列语句放到client安装完成后执行。
+	#cp build/libs/bbb-deskshare-applet-0.8.jar /var/www/bigbluebutton/client/
+
+	cd ../app
+	gradle war
+	#cp -r  app/build/deskshare/ /usr/share/red5/webapps/
+	gradle deploy
 ##bigbluebutton-tomcat，源代码在bigbluebutton-web目录
-		cd bigbluebutton-web/
-		gradle resolveDeps
-		ant war
-		unzip -x bigbluebutton-0.70dev.war  -d /var/lib/tomcat6/webapps/bigbluebutton
+	cd bigbluebutton-web/
+	gradle resolveDeps
+	ant war
+	#如果提示jsecurity不能安装，则到grails list-plugin命令列出的远程仓库中下载jsecurity包，然后手动安装即可---grails instal-plugin xxxxxx.zip
+	unzip -x bigbluebutton-0.70dev.war  -d /var/lib/tomcat6/webapps/bigbluebutton
 	#编辑/var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
 	mkdir /var/lib/tomcat6/webapps/bigbluebutton/demo
 	#设置swftools路径	
 	#设置uuid:securitySalt=a106c6cff65f94ad5c846df9e230b480
-	#设置openoffice脚本
-		cp scripts/sofficed.sh /etc/init.d/bbb-open-office
-		update-rc.d -f bbb-open-office defaults
 
 #录制视频，源代码在record-and-playback目录
 	cd record-and-playback
@@ -221,6 +227,7 @@ cd bigbluebutton
 	cp -r bin/* /var/www/bigbluebutton/client
 	cp config/bigbluebutton.nginx /etc/nginx/sites-available/bigbluebutton
 	ln -s /etc/nginx/sites-available/bigbluebutton /etc/nginx/sites-enabled/bigbluebutton
+	cp ../deskshare/app/build/libs/bbb-deskshare-applet-0.8.jar /var/www/bigbluebutton/client/
 
 #demo
 	cd bbb-api-demo/
@@ -239,7 +246,6 @@ cd bigbluebutton
 	String BigBlueButtonURL = \"http://42.120.7.154/bigbluebutton/\";//this is ip for remote
 	%>" > /var/lib/tomcat6/webapps/demo/bbb_api_conf.jsp
 
-
 #bbb-common-message
 	#1、修改build.gradle
 		flatDir name: 'fileRepo', dirs: "/home/firstuser/dev/repo"
@@ -252,7 +258,6 @@ cd bigbluebutton
 	#5、部署
 		cp repo/bbb-common-message-0.8.jar /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/lib/
 		cp repo/bbb-common-message-0.8.jar /usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/
-
 
 #bbb-lti
 	#1、官方给出的操作步骤
@@ -272,12 +277,10 @@ cd bigbluebutton
 	#3、补充——nginx配置
 		cp lti.nginx /etc/bigbluebutton/nginx/
 
-
 #web-polling
 	#1、已经生成好的应用，只要把war复制到tomcat，nginx配置追加到bigbluebutton即可。
 	cp p.war /var/lib/tomcat6/webapps/
 	cp p.nginx /etc/bigbluebutton/nginx/
-
 
 #设置nginx配置
 	vi /etc/bigbluebutton/nginx/client.nginx
