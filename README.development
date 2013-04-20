@@ -51,6 +51,10 @@ cd ..
 ##ant thirdparty-clean
 wget http://fpdownload.adobe.com/pub/flex/sdk/builds/flex4.5/flex_sdk_4.5.0.20967_mpl.zip
 unzip flex_sdk_4.5.0.20967_mpl.zip -d /usr/share/flex/
+#10.3
+#mkdir 10.3
+#cd 10.3
+#wget http://download.macromedia.com/get/flashplayer/updaters/10/playerglobal10_3.swc
 mkdir /usr/share/flex/frameworks/libs/player/11.2
 cd /usr/share/flex/frameworks/libs/player/11.2/
 wget http://download.macromedia.com/get/flashplayer/updaters/11/playerglobal11_2.swc
