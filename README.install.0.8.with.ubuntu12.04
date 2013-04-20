@@ -53,6 +53,7 @@ cd swftools-0.9.2
 cd ..
 
 apt-get install jsvc -y
+#wget http://mirror.esocc.com/apache/activemq/apache-activemq/5.8.0/apache-activemq-5.8.0-bin.tar.gz
 wget http://apache.sunsite.ualberta.ca/activemq/apache-activemq/5.4.3/apache-activemq-5.4.3-bin.tar.gz
 tar zxvf apache-activemq-5.4.3-bin.tar.gz
 mv apache-activemq-5.4.3 /usr/share/activemq
