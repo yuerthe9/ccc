@@ -140,6 +140,17 @@ echo "#######################################"
 cp bbb/bigbluebutton.war /var/lib/tomcat6/webapps/ 
 #ip设置统一用bbb-conf --setip <IP>
 #bigbluebutton.web.serverURL=http://127.0.0.1设置为本机IP
+#
+#补充设置：
+#	处理文件nopdfmark.ps——
+#	mkdir -p /etc/bigbluebutton
+#	cp slides/nopdfmark.ps /etc/bigbluebutton/
+#	处理文件blank-slide.swf——
+#	mkdir -p /var/bigbluebutton/blank/
+#	cp slides/blank-slide.swf /var/bigbluebutton/blank/
+#	处理文件blank-thumb.png——
+#	cp slides/blank-thumb.png /var/bigbluebutton/blank/
+
 mkdir /etc/bigbluebutton 
 echo "%!
 /pdfmark {cleartomark} bind def" > /etc/bigbluebutton/nopdfmark.ps
