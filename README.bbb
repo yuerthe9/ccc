@@ -28,3 +28,7 @@ freeswitch配置
 	假如我要加一个提示文本——“hi，你好”，做如下修改。
 	<mx:Label text="{ResourceUtil.getInstance().getString('bbb.mainshell.copyrightLabel2',[appVersion]) + 'hi，你好'}" id="copyrightLabel2"/>
 	
+
+gradle使用本地依赖文件进行编译：
+	runtime files('libs/a.jar', 'libs/b.jar')
+
