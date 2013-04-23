@@ -1,23 +1,29 @@
-һ���ֿ�Ľ���
-1����github�ϴ���һ�����ֿ⡱
-2��ʹ��git init��������ء��ֿ⡱
-3�������ء�Զ�ֿ̲�ӳ��������
+一、仓库的建立
+1、在github上创建一个“仓库”
+2、使用git init命令创建本地“仓库”
+3、将本地、远程仓库映射起来：
 git remote add origin git@github.com:yourName/yourRepo.git
 
-�����ֿ��ά��
-1��ȷ����Ҫ���ӵ�Զ�ֿ̲���ļ�
+二、仓库的维护
+1、确认需要添加到远程仓库的文件
 git add -i README
-2���ϴ���Զ�ֿ̲�
+2、上传到远程仓库
 git push origin master
-3���ļ�����
+3、文件更改
 git commit -m "a"
-ͬʱִ�в���2��
-4���ļ�ɾ��
+同时执行操作2。
+4、文件删除
 git rm a.txt
-Ȼ��ͬ��Զ�ֿ̲�
-5���ļ�����
+然后同步远程仓库
+5、文件改名
 git mv file_from file_to
-Ȼ��ͬ��Զ�ֿ̲�
-6���鿴Զ�ֿ̲�
+然后同步远程仓库
+6、查看远程仓库
 git remote -v
-
+7、查看分支
+git branch
+git tag
+8、选择某个分支
+git checkout [branch_name]
+9、忽略本地修改
+git reset --hard
