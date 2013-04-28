@@ -1,6 +1,9 @@
 BBB-client 使用actionscript编写
 BBB-server 使用java/grails/scala
 
+0.71
+    client使用3.5来编译
+
 如何关闭进入会议时播放的声音？
     sudo vi /opt/freeswitch/conf/autoload_configs/conference.conf.xml
     注释调用:<param name="moh-sound" value="$${hold_music}"/>
@@ -32,3 +35,6 @@ freeswitch配置
 gradle使用本地依赖文件进行编译：
 	runtime files('libs/a.jar', 'libs/b.jar')
 
+
+调整client布局：
+	修改此源文件即可——src/org/bigbluebutton/main/views/MainCanvas.mxml
