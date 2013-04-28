@@ -1,0 +1,17 @@
+问题：
+	red5.log
+		ERROR o.red5.server.net.rtmp.RTMPHandler - Error connecting
+		java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Boolean
+解决：
+	
+
+
+
+问题：
+	bigbluebutton-client编译警告
+		’application’ has been deprecated since 4.0.  Please use ‘FlexGlobals.topLevelApplication’
+解决：
+	FlexGlobals.topLevelApplication.stage.displayState=StageDisplayState.FULL_SCREEN;
+代替前文中的Application.application.stage.displayState=StageDisplayState.FULL_SCREEN;就不会再出警告了
+
+	
