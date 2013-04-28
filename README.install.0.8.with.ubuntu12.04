@@ -19,6 +19,7 @@ apt-get update
 apt-get dist-upgrade -y
 apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev ant --yes
 
+
 apt-get install tomcat6 -y
 #安装redis-server
 apt-get install redis-server
@@ -52,12 +53,15 @@ cd swftools-0.9.2
 
 cd ..
 
-apt-get install jsvc -y
-#wget http://mirror.esocc.com/apache/activemq/apache-activemq/5.8.0/apache-activemq-5.8.0-bin.tar.gz
-wget http://apache.sunsite.ualberta.ca/activemq/apache-activemq/5.4.3/apache-activemq-5.4.3-bin.tar.gz
-tar zxvf apache-activemq-5.4.3-bin.tar.gz
-mv apache-activemq-5.4.3 /usr/share/activemq
-chown -R root:root /usr/share/activemq
+#================================
+#0.8不需要activemq了，所以不用安装。
+#apt-get install jsvc -y
+##wget http://mirror.esocc.com/apache/activemq/apache-activemq/5.8.0/apache-activemq-5.8.0-bin.tar.gz
+#wget http://apache.sunsite.ualberta.ca/activemq/apache-activemq/5.4.3/apache-activemq-5.4.3-bin.tar.gz
+#tar zxvf apache-activemq-5.4.3-bin.tar.gz
+#mv apache-activemq-5.4.3 /usr/share/activemq
+#chown -R root:root /usr/share/activemq
+#================================
 
 apt-get -y install build-essential automake autoconf git-core wget libtool
 apt-get -y install libncurses5-dev libtiff-dev libjpeg-dev zlib1g-dev
@@ -374,4 +378,58 @@ git checkout 0.8-deskshare-scaling-fix
 	sudo -u red5 ./red5.sh
 	
 	
-	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#=====================另一种方法===========
+wget http://security.ubuntu.com/ubuntu/pool/main/libf/libffi/libffi5_3.0.9-3ubuntu1_amd64.deb
+dpkg -i libffi5_3.0.9-3ubuntu1_amd64.deb
+sudo apt-get install zlib1g-dev libssl-dev libreadline-dev libyaml-dev build-essential bison checkinstall libffi5 gcc checkinstall libreadline5 libyaml-0-2
+apt-get install libgmp3c2
+
+wget http://free.nchc.org.tw/ubuntu//pool/main/m/mpfr/libmpfr1ldbl_2.4.2-3ubuntu1_amd64.deb
+dpkg -i ./libmpfr1ldbl_2.4.2-3ubuntu1_amd64.deb
+gem install gherkin -v '2.2.9' -- --with-cflags=-w
+gem install cucumber -v '0.7.15' -- --with-cflags=-w
+
+mkdir /var/www/nginx-default
+echo "
+<!DOCTYPE html>
+<html>
+<head>
+<title>Error</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>An error occurred.</h1>
+<p>Sorry, the page you are looking for is currently unavailable.<br/>
+Please try again later.</p>
+<p>If you are the system administrator of this resource then you should check
+the <a href='http://nginx.org/r/error_log'>error log</a> for details.</p>
+<p><em>Faithfully yours, nginx.</em></p>
+</body>
+</html>"> /var/www/nginx-default/50x.html
+
+/etc/init.d/nginx restart 
+
+
+#==========================================
+
