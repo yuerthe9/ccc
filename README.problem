@@ -14,4 +14,39 @@
 	FlexGlobals.topLevelApplication.stage.displayState=StageDisplayState.FULL_SCREEN;
 代替前文中的Application.application.stage.displayState=StageDisplayState.FULL_SCREEN;就不会再出警告了
 
+
+问题:
+	sip.log
+		ERROR o.b.voiceconf.sip.SipPeer - Failed to register with Sip Server
+解决:
+	1>
+		 /usr/share/red5/webapps/sip/WEB_INF/bigbluebutton-sip.properties
+		 sip.server.host修改此属性的值为——127.0.0.1。
+	2>
+		/usr/local/freeswitch/conf/vars.xml 
+		在<X-PRE-PROCESS cmd="set" data="domain=$${local_ip_v4}"/>前添加一行： 
+			<X-PRE-PROCESS cmd="set" data="local_ip_v4=127.0.0.1"/>
+成功标志:
+	INFO  o.b.voiceconf.sip.SipPeer - Successfully registered with Sip Server.
 	
+	
+	
+
+问题:
+	red5.log
+		The scratchDir you specified: /usr/share/red5/work/red5Engine/0.0.0.0/oflaDemo is unusable.
+解决:
+	修改work目录的归属:
+		chown -R red5:adm /usr/share/red5/work
+成功标志:
+	无此异常信息
+	
+	
+	
+
+
+问题：
+	bigbluebutton-client/build.xml
+		The <html-wrapper> task doesn't support the "template" attribute.
+解决：
+		
