@@ -1,52 +1,51 @@
 问题：
-	red5.log
-		ERROR o.red5.server.net.rtmp.RTMPHandler - Error connecting
-		java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Boolean
+  red5.log
+    ERROR o.red5.server.net.rtmp.RTMPHandler - Error connecting
+    java.lang.ClassCastException: java.lang.String cannot be cast to java.lang.Boolean
 解决：
-	
-
 
 
 问题：
-	bigbluebutton-client编译警告
-		’application’ has been deprecated since 4.0.  Please use ‘FlexGlobals.topLevelApplication’
+  bigbluebutton-client编译警告
+    ’application’ has been deprecated since 4.0.  Please use ‘FlexGlobals.topLevelApplication’
 解决：
-	FlexGlobals.topLevelApplication.stage.displayState=StageDisplayState.FULL_SCREEN;
+  FlexGlobals.topLevelApplication.stage.displayState=StageDisplayState.FULL_SCREEN;
 代替前文中的Application.application.stage.displayState=StageDisplayState.FULL_SCREEN;就不会再出警告了
 
 
 问题:
-	sip.log
-		ERROR o.b.voiceconf.sip.SipPeer - Failed to register with Sip Server
+  sip.log
+    ERROR o.b.voiceconf.sip.SipPeer - Failed to register with Sip Server
 解决:
-	1>
-		 /usr/share/red5/webapps/sip/WEB_INF/bigbluebutton-sip.properties
-		 sip.server.host修改此属性的值为——127.0.0.1。
-	2>
-		/usr/local/freeswitch/conf/vars.xml 
-		在<X-PRE-PROCESS cmd="set" data="domain=$${local_ip_v4}"/>前添加一行： 
-			<X-PRE-PROCESS cmd="set" data="local_ip_v4=127.0.0.1"/>
+  1>
+     /usr/share/red5/webapps/sip/WEB_INF/bigbluebutton-sip.properties
+     sip.server.host修改此属性的值为——127.0.0.1。
+  2>
+    /usr/local/freeswitch/conf/vars.xml 
+    在<X-PRE-PROCESS cmd="set" data="domain=$${local_ip_v4}"/>前添加一行： 
+      <X-PRE-PROCESS cmd="set" data="local_ip_v4=127.0.0.1"/>
 成功标志:
-	INFO  o.b.voiceconf.sip.SipPeer - Successfully registered with Sip Server.
-	
-	
-	
+  INFO  o.b.voiceconf.sip.SipPeer - Successfully registered with Sip Server.
+  
 
 问题:
-	red5.log
-		The scratchDir you specified: /usr/share/red5/work/red5Engine/0.0.0.0/oflaDemo is unusable.
+  red5.log
+    The scratchDir you specified: /usr/share/red5/work/red5Engine/0.0.0.0/oflaDemo is unusable.
 解决:
-	修改work目录的归属:
-		chown -R red5:adm /usr/share/red5/work
+  修改work目录的归属:
+    chown -R red5:adm /usr/share/red5/work
 成功标志:
-	无此异常信息
-	
-	
-	
+  无此异常信息
 
 
 问题：
-	bigbluebutton-client/build.xml
-		The <html-wrapper> task doesn't support the "template" attribute.
+  bigbluebutton-client/build.xml
+    The <html-wrapper> task doesn't support the "template" attribute.
 解决：
-		
+
+
+问题：
+  bigbluebutton-apps编译问题
+解决：
+  red5需要1.0r4599版本，如果有某些类找不到直接修改至新版本的包路径即可。
+
