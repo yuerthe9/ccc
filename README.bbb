@@ -37,4 +37,16 @@ gradle使用本地依赖文件进行编译：
 
 
 调整client布局：
-	修改此源文件即可——src/org/bigbluebutton/main/views/MainCanvas.mxml
+	修改此源文件---src/org/bigbluebutton/main/views/MainXXXX.mxml
+
+调整工具条width：
+	添加属性x="{this.width/2}"##没有起作用
+
+
+word/ppt等乱码问题：(把windows下字体文件复制到11目录)
+	 cd /usr/share/fonts
+	mkdir 11
+	chmod -R 755 11
+	mkfontscale
+	mkfontdir
+	fc-cache -fv
