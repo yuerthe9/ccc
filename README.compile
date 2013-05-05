@@ -1,224 +1,243 @@
 ####################
 #bbb-common-message#
 ####################
-#1¡¢ĞŞ¸Äbuild.gradle
-	flatDir name: 'fileRepo', dirs: "/home/firstuser/dev/repo"
-	to
-	flatDir name: 'fileRepo', dirs: "repo"
-#2¡¢ÒÀÀµ¿âÕÒ²»µ½µÄÎÊÌâ£¨Õâ±ÊÕËÊÇ·ñÓ¦¸ÃËãÔÚ¿ª·¢ÈËÔ±ÉíÉÏ£¿^.^£©
-	:: #slf4j-api;1.5.10: not found
-	:: #logback-core;0.9.18: not found
-	:: #logback-classic;0.9.18: not found
-	:: #jcl-over-slf4j;1.5.10: not found
-	:: #log4j-over-slf4j;1.5.10: not found
-	ĞŞ¸Äbuild.gradleÒÀÀµ¿âÅäÖÃ´¦
-	'org.slf4j:slf4j-api:1.5.10'
-	'ch.qos.logback:logback-core:0.9.18'
-	'ch.qos.logback:logback-classic:0.9.18'
-	'org.slf4j:jcl-over-slf4j:1.5.10'
-	'org.slf4j:log4j-over-slf4j:1.5.10'
-#3¡¢±àÒë
-	./vm-build.sh
-#4¡¢½á¹û
-	repo/bbb-common-message-0.8.jar
-#5¡¢ÄæÏò
-	(1)root# find /var -name "bbb-common-message*"
-	/var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/lib/bbb-common-message-0.7.jar
-	(2)root# find /usr -name "bbb-common-message*"
-	/usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/bbb-common-message-0.7.jar
+#1ã€ä¿®æ”¹build.gradle
+  flatDir name: 'fileRepo', dirs: "/home/firstuser/dev/repo"
+  to
+  flatDir name: 'fileRepo', dirs: "repo"
+#2ã€ä¾èµ–åº“æ‰¾ä¸åˆ°çš„é—®é¢˜ï¼ˆè¿™ç¬”è´¦æ˜¯å¦åº”è¯¥ç®—åœ¨å¼€å‘äººå‘˜èº«ä¸Šï¼Ÿ^.^ï¼‰
+  :: #slf4j-api;1.5.10: not found
+  :: #logback-core;0.9.18: not found
+  :: #logback-classic;0.9.18: not found
+  :: #jcl-over-slf4j;1.5.10: not found
+  :: #log4j-over-slf4j;1.5.10: not found
+  ä¿®æ”¹build.gradleä¾èµ–åº“é…ç½®å¤„
+  'org.slf4j:slf4j-api:1.5.10'
+  'ch.qos.logback:logback-core:0.9.18'
+  'ch.qos.logback:logback-classic:0.9.18'
+  'org.slf4j:jcl-over-slf4j:1.5.10'
+  'org.slf4j:log4j-over-slf4j:1.5.10'
+#3ã€ç¼–è¯‘
+  ./vm-build.sh
+#4ã€ç»“æœ
+  repo/bbb-common-message-0.8.jar
+#5ã€é€†å‘
+  (1)root# find /var -name "bbb-common-message*"
+  /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/lib/bbb-common-message-0.7.jar
+  (2)root# find /usr -name "bbb-common-message*"
+  /usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/bbb-common-message-0.7.jar
 
 ##############
 #bbb-api-demo#
 ##############
-#1¡¢¹Ù·½¸ø³öµÄ²Ù×÷²½Öè
-	#Steps:
-	gradle resolveDeps
-	gradle build
-	sudo rm -rf /var/lib/tomcat6/webapps/demo*
-	sudo cp build/libs/demo.war /var/lib/tomcat6/webapps/
-	sudo service tomcat6 restart
-#2¡¢½á¹û
-	build/libs/demo.war
+#1ã€å®˜æ–¹ç»™å‡ºçš„æ“ä½œæ­¥éª¤
+  #Steps:
+  gradle resolveDeps
+  gradle build
+  sudo rm -rf /var/lib/tomcat6/webapps/demo*
+  sudo cp build/libs/demo.war /var/lib/tomcat6/webapps/
+  sudo service tomcat6 restart
+#2ã€ç»“æœ
+  build/libs/demo.war
 
 #########
 #bbb-lti#
 #########
-#1¡¢¹Ù·½¸ø³öµÄ²Ù×÷²½Öè
-	#To generate the war file
-	    grails clean
-	    grails war
-	sudo cp lti-0.1.war /var/lib/tomcat6/webapps/lti.war
-	sudo vi /var/lib/tomcat6/webapps/lti/WEB-INF/classes/lti.properties
-	#Edit the URL and Salt of the BigBlueButton server you are going to connect to
-	    bigbluebuttonURL=http://yourbigbluebuttonserver.com/bigbluebutton
-	    bigbluebuttonSalt=yoursalt
-	#Edit the LTI basic information
-	    ltiEndPoint=http://yourbigbluebuttonserver.com/lti/tool.xml
-	    ltiConsumers=demo:welcome,consumer1:secret1
-	#Restart tomcat
-	    sudo service tomcat6 restart
-#2¡¢½á¹û
-	lti-0.1.war
-#3¡¢²¹³ä¡ª¡ªnginxÅäÖÃ
-	cp lti.nginx /etc/bigbluebutton/nginx/
+#1ã€å®˜æ–¹ç»™å‡ºçš„æ“ä½œæ­¥éª¤
+  #To generate the war file
+      grails clean
+      grails war
+  sudo cp lti-0.1.war /var/lib/tomcat6/webapps/lti.war
+  sudo vi /var/lib/tomcat6/webapps/lti/WEB-INF/classes/lti.properties
+  #Edit the URL and Salt of the BigBlueButton server you are going to connect to
+      bigbluebuttonURL=http://yourbigbluebuttonserver.com/bigbluebutton
+      bigbluebuttonSalt=yoursalt
+  #Edit the LTI basic information
+      ltiEndPoint=http://yourbigbluebuttonserver.com/lti/tool.xml
+      ltiConsumers=demo:welcome,consumer1:secret1
+  #Restart tomcat
+      sudo service tomcat6 restart
+#2ã€ç»“æœ
+  lti-0.1.war
+#3ã€è¡¥å……â€”â€”nginxé…ç½®
+  cp lti.nginx /etc/bigbluebutton/nginx/
 
 ###########
 #bbb-video#
 ###########
-#1¡¢ÓÖ¼ûÒÀÀµÎÊÌâ
+#1ã€åˆè§ä¾èµ–é—®é¢˜
     - unresolved dependency: #logback-core;0.9.28: not found
     - unresolved dependency: #logback-classic;0.9.28: not found
     - unresolved dependency: #log4j-over-slf4j;1.6.1: not found
     - unresolved dependency: #jcl-over-slf4j;1.6.1: not found
     - unresolved dependency: #jul-to-slf4j;1.6.1: not found
     - unresolved dependency: commons#commons-pool;1.5.6: not found
-    ×öÏàÓ¦ĞŞ¸Ä£º
+    åšç›¸åº”ä¿®æ”¹ï¼š
     'ch.qos.logback:logback-core:0.9.28'
-	'ch.qos.logback:logback-classic:0.9.28'
-	'org.slf4j:jcl-over-slf4j:1.6.1'
-	'org.slf4j:log4j-over-slf4j:1.6.1'
-	'org.slf4j:jul-to-slf4j:1.6.1'
-	'commons-pool:commons-pool:1.5.6'
-#2¡¢±àÒë
-	./vm-build.sh
-#1¡¢½á¹û
-	build/libs/video-0.7.war
-	Ö±½Ó²¿Êğµ½ÁË¡ª¡ª/usr/share/red5/webapps
+  'ch.qos.logback:logback-classic:0.9.28'
+  'org.slf4j:jcl-over-slf4j:1.6.1'
+  'org.slf4j:log4j-over-slf4j:1.6.1'
+  'org.slf4j:jul-to-slf4j:1.6.1'
+  'commons-pool:commons-pool:1.5.6'
+#2ã€ç¼–è¯‘
+  ./vm-build.sh
+#1ã€ç»“æœ
+  build/libs/video-0.7.war
+  ç›´æ¥éƒ¨ç½²åˆ°äº†â€”â€”/usr/share/red5/webapps
 
 ###########
 #bbb-voice#
 ###########
-#1¡¢¸ÃËÀµÄ¿ª·¢ÈËÔ±£¬ÓÖÊÇÒÀÀµÎÊÌâ
-	'ch.qos.logback:logback-core:0.9.28'
-	'ch.qos.logback:logback-classic:0.9.28'
-	'org.slf4j:jcl-over-slf4j:1.6.1'
-	'org.slf4j:log4j-over-slf4j:1.6.1'
-	'org.slf4j:jul-to-slf4j:1.6.1'
-#2¡¢±àÒë
-	./vm-build.sh
-#3¡¢½á¹û
-	build/libs/sip-0.7.war
-	Ö±½Ó²¿Êğµ½ÁË¡ª¡ª/usr/share/red5/webapps
+#1ã€è¯¥æ­»çš„å¼€å‘äººå‘˜ï¼Œåˆæ˜¯ä¾èµ–é—®é¢˜
+  'ch.qos.logback:logback-core:0.9.28'
+  'ch.qos.logback:logback-classic:0.9.28'
+  'org.slf4j:jcl-over-slf4j:1.6.1'
+  'org.slf4j:log4j-over-slf4j:1.6.1'
+  'org.slf4j:jul-to-slf4j:1.6.1'
+#2ã€ç¼–è¯‘
+  ./vm-build.sh
+#3ã€ç»“æœ
+  build/libs/sip-0.7.war
+  ç›´æ¥éƒ¨ç½²åˆ°äº†â€”â€”/usr/share/red5/webapps
 
 ######################
 #bbb-voice-conference#
 ######################
-#1¡¢ÅäÖÃÏîÄ¿£¬¹Ù·½¸ø³öµÄÌáÊ¾£º(Éæ¼°freeswtichºÍasteriskµÄÅäÖÃ£¬ÕâÀïÖ»¹Ø×¢freeswitch)
-	mv /usr/local/freeswitch/conf /usr/local/freeswitch/conf.dist
-	cp -a conf /usr/local/freeswitch/
-#2¡¢so easy!±¸·İfreeswitchÄ¬ÈÏÅäÖÃ£¬È»ºó°Ñ´ËÏîÄ¿ÏÂµÄconf×÷ÎªfreeswitchµÄ×îĞÂÅäÖÃ¡£
+#1ã€é…ç½®é¡¹ç›®ï¼Œå®˜æ–¹ç»™å‡ºçš„æç¤ºï¼š(æ¶‰åŠfreeswtichå’Œasteriskçš„é…ç½®ï¼Œè¿™é‡Œåªå…³æ³¨freeswitch)
+  mv /usr/local/freeswitch/conf /usr/local/freeswitch/conf.dist
+  cp -a conf /usr/local/freeswitch/
+#2ã€so easy!å¤‡ä»½freeswitché»˜è®¤é…ç½®ï¼Œç„¶åæŠŠæ­¤é¡¹ç›®ä¸‹çš„confä½œä¸ºfreeswitchçš„æœ€æ–°é…ç½®ã€‚
 
 ####################
 #bigbluebutton-apps#
 ####################
-#1¡¢±àÒë
-	./vm-build.sh
-#2¡¢½á¹û
-	build/libs/bigbluebutton-0.8.war
-	Ö±½Ó²¿Êğµ½ÁË¡ª¡ª/usr/share/red5/webapps
+#1ã€ç¼–è¯‘
+  ./vm-build.sh
+#2ã€ç»“æœ
+  build/libs/bigbluebutton-0.8.war
+  ç›´æ¥éƒ¨ç½²åˆ°äº†â€”â€”/usr/share/red5/webapps
 
 ######################
 #bigbluebutton-client#
 ######################
-#1¡¢¿ÉÄÜÊÇÈËÆ·²»ºÃ£¬ÊÖ¶¯´¦ÀíÅäÖÃÎÄ¼ş¡£
-	cp resources/config.xml.template src/conf/config.xml
-	cp resources/dev/join-mock.xml src/conf/join-mock.xml
-#2¡¢±àÒë
-	ant locales
-	ant
-#3¡¢½á¹û
-	binÄ¿Â¼ÏÂµÄÎÄ¼ş¡ª¡ªwww/bigbluebutton/client
-	config¡ª¡ªnginxÅäÖÃ
+#1ã€å¯èƒ½æ˜¯äººå“ä¸å¥½ï¼Œæ‰‹åŠ¨å¤„ç†é…ç½®æ–‡ä»¶ã€‚
+  cp resources/config.xml.template src/conf/config.xml
+  cp resources/dev/join-mock.xml src/conf/join-mock.xml
+#2ã€ç¼–è¯‘
+  ant locales
+  ant
+#3ã€ç»“æœ
+  binç›®å½•ä¸‹çš„æ–‡ä»¶â€”â€”www/bigbluebutton/client
+  configâ€”â€”nginxé…ç½®
 
 
 ######################
 #bigbluebutton-config#
 ######################
-#1¡¢Ò»Ğ©ÅäÖÃ£¬µ«ÊÇÃ»ÓĞ´æ·ÅµÄËµÃ÷£¿£¿£¿£¿£¿£¿£¿£¿£¿£¿£¿£¿
-#2¡¢ÄæÏò£¨²Î¿¼µÄÊÇ0.8°æ±¾£©
-	bigbluebutton-release¡ª¡ª/etc/bigbluebutton/
-	bin¡ª¡ª/usr/local/bin
-	cron.daily¡ª¡ª/etc/cron.daily
-	record¡ª¡ªÃ»ÓĞÕÒµ½
-	slides:
-		nopdfmark.ps¡ª¡ª/etc/bigbluebutton/nopdfmark.ps
-		blank-slide.swf¡ª¡ª/var/bigbluebutton/blank/blank-slide.swf
-		blank-thumb.png¡ª¡ª/var/bigbluebutton/blank/blank-thumb.png
-	web¡ª¡ª/var/www/bigbluebutton-default
+#1ã€ä¸€äº›é…ç½®ï¼Œä½†æ˜¯æ²¡æœ‰å­˜æ”¾çš„è¯´æ˜ï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿï¼Ÿ
+#2ã€é€†å‘ï¼ˆå‚è€ƒçš„æ˜¯0.8ç‰ˆæœ¬ï¼‰
+  bigbluebutton-releaseâ€”â€”/etc/bigbluebutton/
+  binâ€”â€”/usr/local/bin
+  cron.dailyâ€”â€”/etc/cron.daily
+  recordâ€”â€”æ²¡æœ‰æ‰¾åˆ°
+  slides:
+    nopdfmark.psâ€”â€”/etc/bigbluebutton/nopdfmark.ps
+    blank-slide.swfâ€”â€”/var/bigbluebutton/blank/blank-slide.swf
+    blank-thumb.pngâ€”â€”/var/bigbluebutton/blank/blank-thumb.png
+  webâ€”â€”/var/www/bigbluebutton-default
 
 
 ###################
 #bigbluebutton-web#
 ###################
-#1¡¢±àÒë
-	grails war
-#2¡¢½á¹û
-	bigbluebutton-0.70dev.war
-	Î»ÖÃÔÚ/usr/lib/tomcat6/webapps/
-	
+#1ã€ç¼–è¯‘
+  grails war
+#2ã€ç»“æœ
+  bigbluebutton-0.70dev.war
+  ä½ç½®åœ¨/usr/lib/tomcat6/webapps/
+  
 
 ###########
 #deskshare#
 ###########
-#1¡¢xxxxÒÀÀµ£¬ÎÒÒªÂîÈËÁË¡£
+#1ã€xxxxä¾èµ–ï¼Œæˆ‘è¦éª‚äººäº†ã€‚
     - unresolved dependency: #logback-core;0.9.28: not found
     - unresolved dependency: #logback-classic;0.9.28: not found
     - unresolved dependency: #log4j-over-slf4j;1.6.1: not found
     - unresolved dependency: #jcl-over-slf4j;1.6.1: not found
     - unresolved dependency: #jul-to-slf4j;1.6.1: not found
-    ³ıÁË¸ùÄ¿Â¼µÄbuild.gradle»¹ÓĞappÏÂµÄbuild.gradle£¬ÎÒÀÕ¸öÈ¥£¡£¡£¡
-#2¡¢±àÒë
-	gradle assemble
-#3¡¢½á¹û
-	app/build/libs/bbb-deskshare-app-0.71.warºÍapp-0.70.jar
-	applet/build/libs/bbb-deskshare-applet-0.8.jar
-	common/build/libs/bbb-deskshare-common-0.8.jar
-#4¡¢ÄæÏò
-	bbb-deskshare-app-0.71.war¡ª¡ª²¿ÊğÔÚred5ÏÂ
-	app-0.70.jar¡ª¡ªÎ´Öª
-	bbb-deskshare-applet-0.8.jar¡ª¡ª/var/www/bigbluebutton/client/
-	bbb-deskshare-common-0.8.jar¡ª¡ª/usr/share/red5/webapps/deskshare/
-	
+    é™¤äº†æ ¹ç›®å½•çš„build.gradleè¿˜æœ‰appä¸‹çš„build.gradleï¼Œæˆ‘å‹’ä¸ªå»ï¼ï¼ï¼
+#2ã€ç¼–è¯‘
+  gradle assemble
+#3ã€ç»“æœ
+  app/build/libs/bbb-deskshare-app-0.71.warå’Œapp-0.70.jar
+  applet/build/libs/bbb-deskshare-applet-0.8.jar
+  common/build/libs/bbb-deskshare-common-0.8.jar
+#4ã€é€†å‘
+  bbb-deskshare-app-0.71.warâ€”â€”éƒ¨ç½²åœ¨red5ä¸‹
+  app-0.70.jarâ€”â€”æœªçŸ¥
+  bbb-deskshare-applet-0.8.jarâ€”â€”/var/www/bigbluebutton/client/
+  bbb-deskshare-common-0.8.jarâ€”â€”/usr/share/red5/webapps/deskshare/
+  
 
 ################
 #esl-client-bbb#
 ################
-#1¡¢ÒÀÀµ¡£¡£¡£¡£¡£¡£¡£¡£¡£¡£
+#1ã€ä¾èµ–ã€‚ã€‚ã€‚ã€‚ã€‚ã€‚ã€‚ã€‚ã€‚ã€‚
     - unresolved dependency: #slf4j-api;1.6.1: not found
     - unresolved dependency: #logback-core;0.9.18: not found
     - unresolved dependency: #logback-classic;0.9.18: not found
     - unresolved dependency: #jcl-over-slf4j;1.5.10: not found
     - unresolved dependency: #log4j-over-slf4j;1.5.10:
-#2¡¢±àÒëorg.freeswitch.esl.clientÄ¿Â¼
-	gradle assemble
-#3¡¢½á¹û
-	org.freeswitch.esl.client/build/libs/fs-esl-client-0.8.2.jar
-#4¡¢Î»ÖÃ
-	fs-esl-client-0.8.2.jar¡ª¡ª/usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/fs-esl-client-0.8.2.jar
+#2ã€ç¼–è¯‘org.freeswitch.esl.clientç›®å½•
+  gradle assemble
+#3ã€ç»“æœ
+  org.freeswitch.esl.client/build/libs/fs-esl-client-0.8.2.jar
+#4ã€ä½ç½®
+  fs-esl-client-0.8.2.jarâ€”â€”/usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/fs-esl-client-0.8.2.jar
 
 
 ######
 #labs#
 ######
-#1¡¢ÊôÓÚÊµÑéĞÔÖÊµÄÄ£¿é£¬¿ÉÒÔ¹Ø×¢¡£
+#1ã€å±äºå®éªŒæ€§è´¨çš„æ¨¡å—ï¼Œå¯ä»¥å…³æ³¨ã€‚
 
 
 #####################
 #record-and-playback#
 #####################
-#1¡¢°²×°
-	deploy.sh
-#2¡¢µ¥¶À°²×°matterhorn£¨ÔİÊ±²»ÖªµÀÕâÊÇÊ²Ã´¶«Î÷£©
-	matterhorn-install.sh
-	#¼ÇµÃ²é¿´README£¬Í¬Ê±¸ù¾İÊµ¼ÊÇé¿öĞŞ¸Ämatterhorn-install.sh°²×°½Å±¾¡£
+#1ã€å®‰è£…
+  deploy.sh
+#2ã€å•ç‹¬å®‰è£…matterhornï¼ˆæš‚æ—¶ä¸çŸ¥é“è¿™æ˜¯ä»€ä¹ˆä¸œè¥¿ï¼‰
+  matterhorn-install.sh
+  #è®°å¾—æŸ¥çœ‹READMEï¼ŒåŒæ—¶æ ¹æ®å®é™…æƒ…å†µä¿®æ”¹matterhorn-install.shå®‰è£…è„šæœ¬ã€‚
+  sudo apt-get install libxml2
+  sudo apt-get install libxml2-dev
+  sudo apt-get install libxslt-dev
+  sudo apt-get install thin
 
+  sudo gem install bundler
+  sudo gem install bundle 
+  #Edit the bigbluebutton.yml file according to your installation
+  ## For development
+    sudo thin -R config.ru start
+  ## For production
+        sudo thin install
+        sudo /usr/sbin/update-rc.d -f thin defaults
+        sudo sh deploy.sh
+        sudo service thin start
+  #matterhorn.nginx
+        location /matterhorn/ {
+                proxy_pass                      http://127.0.0.1:3000/;
+                proxy_redirect          default;
+        }
 
 #############
 #web-polling#
 #############
-#1¡¢ÒÑ¾­Éú³ÉºÃµÄÓ¦ÓÃ£¬Ö»Òª°Ñwar¸´ÖÆµ½tomcat£¬nginxÅäÖÃ×·¼Óµ½bigbluebutton¼´¿É¡£
-	cp p.war /var/lib/tomcat6/webapps/
-	cp p.nginx /etc/bigbluebutton/nginx/
+#1ã€å·²ç»ç”Ÿæˆå¥½çš„åº”ç”¨ï¼Œåªè¦æŠŠwarå¤åˆ¶åˆ°tomcatï¼Œnginxé…ç½®è¿½åŠ åˆ°bigbluebuttonå³å¯ã€‚
+  cp p.war /var/lib/tomcat6/webapps/
+  cp p.nginx /etc/bigbluebutton/nginx/
 
 
 ##################
