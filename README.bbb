@@ -30,6 +30,7 @@ freeswitch配置
 	<mx:Label text="{ResourceUtil.getInstance().getString('bbb.mainshell.copyrightLabel2',[appVersion])}" id="copyrightLabel2"/>
 	假如我要加一个提示文本——“hi，你好”，做如下修改。
 	<mx:Label text="{ResourceUtil.getInstance().getString('bbb.mainshell.copyrightLabel2',[appVersion]) + 'hi，你好'}" id="copyrightLabel2"/>
+	#更灵活的方式是修改locale下的对应语言的配置文件内容。
 	
 
 gradle使用本地依赖文件进行编译：
@@ -39,9 +40,6 @@ gradle使用本地依赖文件进行编译：
 调整client布局：
 	修改此源文件---src/org/bigbluebutton/main/views/MainXXXX.mxml
 
-调整工具条width：
-	添加属性x="{this.width/2}"##没有起作用
-
 
 word/ppt等乱码问题：(把windows下字体文件复制到11目录)
 	 cd /usr/share/fonts
@@ -50,3 +48,13 @@ word/ppt等乱码问题：(把windows下字体文件复制到11目录)
 	mkfontscale
 	mkfontdir
 	fc-cache -fv
+
+进入后的页面title设置：
+	修改client/lib/bbb_blinker.js
+	如果是中文标题，那么必须转码为unicode的16进制编码。
+
+修改地址栏BigBlueButton.html
+	tomcat/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties文件中的client地址设置项。
+	同时需要修改/etc/bigbluebutton/nginx/client.nginx
+	记得修改client下的文件名和重启tomcat和nginx。
+
