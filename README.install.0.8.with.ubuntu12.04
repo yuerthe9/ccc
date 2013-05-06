@@ -180,6 +180,15 @@ git checkout v0.8 -b my0.8
     ./vm-build.sh
   ##sip
     cd bbb-voice
+    #修改下面两个类将下面列出的内容替换原有代码
+    #不知道还有没有更好的办法了^_^
+    bbb-voice/src/main/java/org/bigbluebutton/voiceconf/red5/media/AudioBroadcastStream.java
+    bbb-voice/src/main/java/org/red5/app/sip/AudioStream.java
+    #使用下列代码替换原有代码
+    //RTMPMessage msg = RTMP    Message.build(rtmpEvent);
+    RTMPMessage msg = new RT    MPMessage();
+    msg.setBody(rtmpEvent);
+    #编译
     ./vm-build.sh
     #lsof -i :9123#查看端口是否在使用
   ##bigbluebutton-red5，源代码在bigbluebutton-apps目录
@@ -206,7 +215,7 @@ git checkout v0.8 -b my0.8
     gradle resolveDeps
     ant war
     #如果提示jsecurity不能安装，则到grails list-plugin命令列出的远程仓库中下载jsecurity包，然后手动安装即可---grails instal-plugin xxxxxx.zip
-    unzip -x bigbluebutton-0.70dev.war  -d /var/lib/tomcat6/webapps/bigbluebutton
+    cp bigbluebutton-0.70dev.war  /var/lib/tomcat6/webapps/bigbluebutton.war
     #编辑/var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
     mkdir /var/lib/tomcat6/webapps/bigbluebutton/demo
     #设置swftools路径  
