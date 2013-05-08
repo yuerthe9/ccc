@@ -58,3 +58,9 @@ word/ppt等乱码问题：(把windows下字体文件复制到11目录)
 	同时需要修改/etc/bigbluebutton/nginx/client.nginx
 	记得修改client下的文件名和重启tomcat和nginx。
 
+修改退出操作：
+	原有效果是指向到一个URL，修改后的效果是关闭页面。
+	修改tomcat/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties文件的属性值：
+		bigbluebutton.web.logoutURL=${bigbluebutton.web.serverURL}/exit.html
+	建立exit.html，内容就是window.close()
+
