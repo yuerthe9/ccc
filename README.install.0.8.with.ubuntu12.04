@@ -102,6 +102,9 @@ chmod -R 755 /usr/local/freeswitch/conf
 
 #建立必要的目录
 mkdir /var/log/bigbluebutton
+mkdir -p /var/bigbluebutton/conference-mock-default/conference-mock-default/appkonference
+mkdir -p /var/freeswitch/meetings
+chown -R freeswitch:freeswitch /var/freeswitch/
 mkdir -p /var/bigbluebutton/published
 mkdir -p /var/bigbluebutton/unpublished
 mkdir -p /var/bigbluebutton/recording/status/recorded  
