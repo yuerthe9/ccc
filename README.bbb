@@ -45,6 +45,7 @@ word/ppt等乱码问题：(把windows下字体文件复制到11目录)
 	 cd /usr/share/fonts
 	mkdir 11
 	chmod -R 755 11
+        cd 11/
 	mkfontscale
 	mkfontdir
 	fc-cache -fv
