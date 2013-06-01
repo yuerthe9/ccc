@@ -70,3 +70,16 @@ word/ppt等乱码问题：
 		bigbluebutton.web.logoutURL=${bigbluebutton.web.serverURL}/exit.html
 	建立exit.html，内容就是window.close()
 
+修改上传页面：
+	src/org/bigbluebutton/modules/present/ui/views/FileUploadWindow.mxml
+        增加<mx:Label id="msg" text="{ResourceUtil.getInstance().getString('bbb.fileupload.uploadmsg')}" x="50" y="96"/>
+	记得在资源文件中加入提示说明文字。
+	加强版：（增加字体颜色和粗细的设置）
+		1、设置creationComplete事件为函数fillColor
+		2、定义fillColor函数：
+		private function fillColor():void{
+                        msg.setStyle('color','red');
+                        msg.setStyle('fontWeight','bold');
+			msg.setStyle('fontSize','12');
+                }
+
