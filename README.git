@@ -24,6 +24,9 @@ git remote -v
 git branch
 git tag
 8、选择某个分支
-git checkout [branch_name]
+git checkout [branch_name] -b new_branch_name
 9、忽略本地修改
 git reset --hard
+10、删除一个分支
+git branch -D [branch_name]
+

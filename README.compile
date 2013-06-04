@@ -124,6 +124,10 @@
   cp resources/config.xml.template src/conf/config.xml
   cp resources/dev/join-mock.xml src/conf/join-mock.xml
 #2、编译
+  cd locale
+  sed -i 's/BigBlueButton/yida/g' */*.properties
+  sed -i 's/www.bigbluebutton.org/www.huiwuyi.com/g' */*.properties
+  cd ..
   ant locales
   ant
 #3、结果

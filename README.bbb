@@ -82,4 +82,6 @@ word/ppt等乱码问题：
                         msg.setStyle('fontWeight','bold');
 			msg.setStyle('fontSize','12');
                 }
+关闭“桌面共享”
+	将client的config.xml中的DeskShareModule注释掉即可。
 

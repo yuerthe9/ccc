@@ -17,7 +17,8 @@ source ~/.bashrc
 
 apt-get update
 apt-get dist-upgrade -y
-apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev ant --yes
+apt-get install make build-essential libtool zlib1g-dev autoconf libssl-dev libyaml-dev bison checkinstall gcc libreadline5 libyaml-0-2 git-core yasm texi2html libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev libvorbis-dev libx11-dev libxfixes-dev libxvidcore-dev ant automake wget libncurses5-dev libtiff-dev --yes
+
 
 apt-get install tomcat6 -y
 #安装redis-server
@@ -52,28 +53,18 @@ cd swftools-0.9.2
 
 cd ..
 
-apt-get install jsvc -y
-#wget http://mirror.esocc.com/apache/activemq/apache-activemq/5.8.0/apache-activemq-5.8.0-bin.tar.gz
-wget http://apache.sunsite.ualberta.ca/activemq/apache-activemq/5.4.3/apache-activemq-5.4.3-bin.tar.gz
-tar zxvf apache-activemq-5.4.3-bin.tar.gz
-mv apache-activemq-5.4.3 /usr/share/activemq
-chown -R root:root /usr/share/activemq
-
-apt-get -y install build-essential automake autoconf git-core wget libtool
-apt-get -y install libncurses5-dev libtiff-dev libjpeg-dev zlib1g-dev
 git clone git://git.freeswitch.org/freeswitch.git
 cd freeswitch && ./bootstrap.sh&&./configure&&make install &&make sounds-install&&make moh-install
 
 
-#red5安装
+#red5安装  规划的版本要求---1.0.2，但是red5还没有这个版本。
 cd lib
-wget http://red5.org/downloads/red5/1_0/red5-1.0.0.tar.gz
-tar xvf red5-1.0.0.tar.gz
-mv red5-1.0.0-build-jenkins-red5-226 /usr/share/red5
+wget https://bigbluebutton.googlecode.com/files/bbb-red5-1.0.0-rc1.tar.gz
+tar xvf bbb-red5-1.0.0-rc1.tar.gz
+mv bbb-red5-1.0-rc/ /usr/share/red5
 
 #freeswitch配置
 cp debian/freeswitch-sysvinit.freeswitch.init /etc/init.d/freeswitch
-#sed debian/freeswitch-sysvinit.freeswitch.init -e s,opt,usr/local, >/etc/init.d/freeswitch
 addgroup freeswitch
 adduser --disabled-password  --quiet --system --home /usr/local/freeswitch --gecos "FreeSwitch Voice Platform" --ingroup freeswitch freeswitch
 mkdir /var/lib/freeswitch
@@ -93,19 +84,15 @@ mv /usr/local/freeswitch/conf /usr/local/freeswitch/conf.dist
 cp -a bigbluebutton/bbb-voice-conference/config/freeswitch/conf /usr/local/freeswitch/
 chown -R freeswitch:freeswitch /usr/local/freeswitch/
 chmod -R 755 /usr/local/freeswitch/conf
-#9123端口没有启用的问题：
-#这样还是没有用:
-	#把/usr/share/red5/webapps/deskshare/WEB-INF/deskshare.properties中，9123端口设置行等号两边的空格去掉。
-	#/sbin/iptables -A INPUT -p tcp --dport 1935 -j ACCEPT 
-	#/sbin/iptables -A INPUT -p tcp --dport 9123 -j ACCEPT 
-#不知道是不是有关系，装了ffmpeg后居然启用了。
-
 
 #建立必要的目录
 mkdir /var/log/bigbluebutton
+mkdir -p /var/bigbluebutton/conference-mock-default/conference-mock-default/appkonference
+mkdir -p /var/freeswitch/meetings
+chown -R freeswitch:freeswitch /var/freeswitch/
 mkdir -p /var/bigbluebutton/published
 mkdir -p /var/bigbluebutton/unpublished
-mkdir -p /var/bigbluebutton/recording/status/recorded	
+mkdir -p /var/bigbluebutton/recording/status/recorded  
 mkdir -p /usr/local/bigbluebutton/core/lib/
 mkdir -p /usr/local/bigbluebutton/core/scripts
 mkdir -p /etc/bigbluebutton/nginx
@@ -123,6 +110,7 @@ chown -R tomcat6:adm /var/log/bigbluebutton/bbb-web.log
 
 #red5配置
 adduser --system --home /usr/share/red5 --no-create-home --group --disabled-password --shell /bin/false red5
+mkdir /usr/share/red5/work
 chown -R root:root /usr/share/red5
 chown -R red5:adm /usr/share/red5/log
 chown -R red5:adm /usr/share/red5/work
@@ -137,162 +125,138 @@ wget http://repo1.maven.org/maven2/commons-fileupload/commons-fileupload/1.3/com
 git clone git://github.com/bigbluebutton/bigbluebutton.git
 
 cd bigbluebutton
+git checkout v0.8 -b my0.8
 ###########################################################################################
 ###### 编译源代码进行部署
 ###########################################################################################
-##video
-	cd bbb-video/
-	./vm-build.sh
+##nginx
+    #bigbluebutton-default，源代码在bigbluebutton-config目录
+    cd bigbluebutton-config
+    #把web下的文件目录都复制过来。
+    mkdir -p /var/www/bigbluebutton-default
+    cp -r web/* /var/www/bigbluebutton-default/
+    #复制配置文件
+    #cp bigbluebutton-release /etc/bigbluebutton/#好像0.81中没有这个文件了。
+    #把bigbluebutton-config/bin下的文件目录都复制过来。
+    cp bin/* /usr/local/bin
+    chmod a+x /usr/local/bin/bbb-conf
+    sed -i 's,opt/,usr/local/,' /usr/local/bin/bbb-conf
+    #处理文件nopdfmark.ps——
+    mkdir -p /etc/bigbluebutton
+    cp slides/nopdfmark.ps /etc/bigbluebutton/
+    #处理文件blank-slide.swf——
+    mkdir -p /var/bigbluebutton/blank/
+    cp slides/blank-slide.swf /var/bigbluebutton/blank/
+    #处理文件blank-thumb.png——
+    cp slides/blank-thumb.png /var/bigbluebutton/blank/
 
-##sip
-	cd bbb-voice
-	./vm-build.sh
+  #bigbluebutton-client，源代码为[bigbluebutton-client]目录
+    cd bigbluebutton-client
+    ant locales
+    ant
+    #flex版本要求4.5，player要求10.3
+    mkdir -p /var/www/bigbluebutton/client
+    cp -r bin/* /var/www/bigbluebutton/client
+    cp config/bigbluebutton.nginx /etc/nginx/sites-available/bigbluebutton
+    ln -s /etc/nginx/sites-available/bigbluebutton /etc/nginx/sites-enabled/bigbluebutton
+    #cp ../deskshare/app/build/libs/bbb-deskshare-applet-0.8.jar /var/www/bigbluebutton/client/
+    #bbb-deskshare-applet-0.8.jar无须手动拷贝，因为编译完成后就已经包含了此jar包。
+    
+##red5
+  ##video
+    cd bbb-video/
+    ./vm-build.sh
+  ##sip
+    cd bbb-voice
+    #编译
+    ./vm-build.sh
+    #lsof -i :9123#查看端口是否在使用
+  ##bigbluebutton-red5，源代码在bigbluebutton-apps目录
+    cd bigbluebutton-apps/
+    ./vm-build.sh
+  ##deskshare
+    cd deskshare/
+    gradle resolveDeps
+    cd common
+    gradle clean
+    gradle jar
+    cd ../applet
+    gradle jar
+    #ant create-signing-key
+    #ant sign-jar
+    cd ../app
+    gradle war
+    #cp -r  app/build/deskshare/ /usr/share/red5/webapps/
+    gradle deploy
+    
+##tomcat
+  ##bigbluebutton-tomcat，源代码在bigbluebutton-web目录
+    cd bigbluebutton-web/
+    gradle resolveDeps
+    ant war
+    #如果提示jsecurity不能安装，则到grails list-plugin命令列出的远程仓库中下载jsecurity包，然后手动安装即可---grails instal-plugin xxxxxx.zip
+    cp bigbluebutton-0.70dev.war  /var/lib/tomcat6/webapps/bigbluebutton.war
+    #编辑/var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
+    mkdir /var/lib/tomcat6/webapps/bigbluebutton/demo
+    #设置swftools路径  
+    #设置uuid:securitySalt=a106c6cff65f94ad5c846df9e230b480
+  #demo
+    cd bbb-api-demo/
+    gradle resolveDeps
+    gradle build
+    sudo rm -rf /var/lib/tomcat6/webapps/demo*
+    sudo cp build/libs/demo.war /var/lib/tomcat6/webapps/
+    sudo service tomcat6 restart
+    #nginx配置
+    cp demo.nginx /etc/bigbluebutton/nginx/
 
-#lsof -i :9123#查看端口是否在使用
-
-##bigbluebutton-red5，源代码在bigbluebutton-apps目录
-	cd bigbluebutton-apps/
-	./vm-build.sh
-
-##deskshare
-	cd deskshare/
-	gradle resolveDeps
-
-	cd common
-	gradle clean
-	gradle jar
-
-	cd ../applet
-	gradle jar
-	ant create-signing-key
-	ant sign-jar
-	
-	#按照本文的安装顺序，下列语句将报错，所以将下列语句放到client安装完成后执行。
-	#cp build/libs/bbb-deskshare-applet-0.8.jar /var/www/bigbluebutton/client/
-
-	cd ../app
-	gradle war
-	#cp -r  app/build/deskshare/ /usr/share/red5/webapps/
-	gradle deploy
-##bigbluebutton-tomcat，源代码在bigbluebutton-web目录
-	cd bigbluebutton-web/
-	gradle resolveDeps
-	ant war
-	#如果提示jsecurity不能安装，则到grails list-plugin命令列出的远程仓库中下载jsecurity包，然后手动安装即可---grails instal-plugin xxxxxx.zip
-	unzip -x bigbluebutton-0.70dev.war  -d /var/lib/tomcat6/webapps/bigbluebutton
-	#编辑/var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties
-	mkdir /var/lib/tomcat6/webapps/bigbluebutton/demo
-	#设置swftools路径	
-	#设置uuid:securitySalt=a106c6cff65f94ad5c846df9e230b480
+    echo "<%!
+    // This is the security salt that must match the value set in the BigBlueButton server
+    String salt = \"a106c6cff65f94ad5c846df9e230b480\";
+    // This is the URL for the BigBlueButton server
+    String BigBlueButtonURL = \"http://42.120.7.154/bigbluebutton/\";//this is ip for remote
+    %>" > /var/lib/tomcat6/webapps/demo/bbb_api_conf.jsp
 
 #录制视频，源代码在record-and-playback目录
-	cd record-and-playback
-	./deploy.sh
-	##god部署,源代码在record-and-playback/core目录
-	#对应于/etc/init.d/bbb-record-core这个服务
-	#安装god
-		gem install god
-	#部署
-	1. Copy god dir to /etc/bigbluebutton
-		            cp -R core/god/god /etc/bigbluebutton/
-	2. Copy initd.god as to /etc/init.d/god
-		            sudo cp core/god/initd.god /etc/init.d/god
-		            chmod +x /etc/init.d/god
-		            sudo /usr/sbin/update-rc.d -f god defaults
-	3. Start god
-		sudo /etc/init.d/god start
-
-#设置bigbluebutton-default，源代码在bigbluebutton-config目录
-	cd bigbluebutton-config
-	#把web下的文件目录都复制过来。
-	mkdir -p /var/www/bigbluebutton-default
-	cp -r web/* /var/www/bigbluebutton-default/
-	#复制配置文件
-	cp bigbluebutton-release /etc/bigbluebutton/
-	#把bigbluebutton-config/bin下的文件目录都复制过来。
-	cp bin/* /usr/local/bin
-	chmod a+x /usr/local/bin/bbb-conf 
-	sed -i 's,opt/,usr/local/,' /usr/local/bin/bbb-conf 
-	#处理文件nopdfmark.ps——
-		mkdir -p /etc/bigbluebutton
-		cp slides/nopdfmark.ps /etc/bigbluebutton/
-	#处理文件blank-slide.swf——
-		mkdir -p /var/bigbluebutton/blank/
-		cp slides/blank-slide.swf /var/bigbluebutton/blank/
-	#处理文件blank-thumb.png——
-		cp slides/blank-thumb.png /var/bigbluebutton/blank/
-
-#设置bigbluebutton-client，源代码为[bigbluebutton-client]目录
-	cd bigbluebutton-client
-	mkdir -p /var/www/bigbluebutton/client
-	cp -r bin/* /var/www/bigbluebutton/client
-	cp config/bigbluebutton.nginx /etc/nginx/sites-available/bigbluebutton
-	ln -s /etc/nginx/sites-available/bigbluebutton /etc/nginx/sites-enabled/bigbluebutton
-	cp ../deskshare/app/build/libs/bbb-deskshare-applet-0.8.jar /var/www/bigbluebutton/client/
-
-#demo
-	cd bbb-api-demo/
-	gradle resolveDeps
-	gradle build
-	sudo rm -rf /var/lib/tomcat6/webapps/demo*
-	sudo cp build/libs/demo.war /var/lib/tomcat6/webapps/
-	sudo service tomcat6 restart
-	#nginx配置
-	cp demo.nginx /etc/bigbluebutton/nginx/
-
-	echo "<%!
-	// This is the security salt that must match the value set in the BigBlueButton server
-	String salt = \"a106c6cff65f94ad5c846df9e230b480\";
-	// This is the URL for the BigBlueButton server
-	String BigBlueButtonURL = \"http://42.120.7.154/bigbluebutton/\";//this is ip for remote
-	%>" > /var/lib/tomcat6/webapps/demo/bbb_api_conf.jsp
+  cd record-and-playback
+  ./deploy.sh
+  ##god部署,源代码在record-and-playback/core目录
+  #对应于/etc/init.d/bbb-record-core这个服务
+  #安装god
+    gem install god
+  #部署
+  1. Copy god dir to /etc/bigbluebutton
+                cp -R core/god/god /etc/bigbluebutton/
+  2. Copy initd.god as to /etc/init.d/god
+                sudo cp core/god/initd.god /etc/init.d/god
+                chmod +x /etc/init.d/god
+                sudo /usr/sbin/update-rc.d -f god defaults
+  3. Start god
+    sudo /etc/init.d/god start
 
 #bbb-common-message
-	#1、修改build.gradle
-		flatDir name: 'fileRepo', dirs: "/home/firstuser/dev/repo"
-		to
-		flatDir name: 'fileRepo', dirs: "repo"
-	#3、编译
-		./vm-build.sh
-	#4、结果
-		repo/bbb-common-message-0.8.jar
-	#5、部署
-		cp repo/bbb-common-message-0.8.jar /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/lib/
-		cp repo/bbb-common-message-0.8.jar /usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/
-
-#bbb-lti
-	#1、官方给出的操作步骤
-		#To generate the war file
-			grails clean
-			grails war
-		sudo cp lti-0.1.war /var/lib/tomcat6/webapps/lti.war
-		sudo vi /var/lib/tomcat6/webapps/lti/WEB-INF/classes/lti.properties
-		#Edit the URL and Salt of the BigBlueButton server you are going to connect to
-			bigbluebuttonURL=http://yourbigbluebuttonserver.com/bigbluebutton
-			bigbluebuttonSalt=yoursalt
-		#Edit the LTI basic information
-			ltiEndPoint=http://yourbigbluebuttonserver.com/lti/tool.xml
-			ltiConsumers=demo:welcome,consumer1:secret1
-		#Restart tomcat
-			sudo service tomcat6 restart
-	#3、补充——nginx配置
-		cp lti.nginx /etc/bigbluebutton/nginx/
-
-#web-polling
-	#1、已经生成好的应用，只要把war复制到tomcat，nginx配置追加到bigbluebutton即可。
-	cp p.war /var/lib/tomcat6/webapps/
-	cp p.nginx /etc/bigbluebutton/nginx/
+  #1、修改build.gradle
+    flatDir name: 'fileRepo', dirs: "/home/firstuser/dev/repo"
+    to
+    flatDir name: 'fileRepo', dirs: "repo"
+  #3、编译
+    ./vm-build.sh
+  #4、结果
+    repo/bbb-common-message-0.8.jar
+  #5、部署
+    cp repo/bbb-common-message-0.8.jar /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/lib/
+    cp repo/bbb-common-message-0.8.jar /usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/
 
 #设置nginx配置
-	vi /etc/bigbluebutton/nginx/client.nginx
-	vi /etc/bigbluebutton/nginx/web.nginx
-	
+  vi /etc/bigbluebutton/nginx/client.nginx
+  vi /etc/bigbluebutton/nginx/web.nginx
+  
 ##设置BBB的ip
-	bbb-conf --setip xxx
+  bbb-conf --setip xxx
 
 ##############################################################################
 #附表：
-	##/etc/bigbluebutton/nginx/client.nginx
+  ##/etc/bigbluebutton/nginx/client.nginx
         # BigBlueButton.html is here so we can expire it every 1 minute to
         # prevent caching.
         location /client/BigBlueButton.html {
@@ -307,7 +271,7 @@ cd bigbluebutton
                 index  index.html index.htm;
         }
         
-	##/etc/bigbluebutton/nginx/slides.nginx
+  ##/etc/bigbluebutton/nginx/slides.nginx
         location /playback/slides {
                 root    /var/bigbluebutton;
                 index  index.html index.htm;
@@ -318,7 +282,7 @@ cd bigbluebutton
                 index  index.html index.htm;
         }
         
-	##/etc/bigbluebutton/nginx/web.nginx
+  ##/etc/bigbluebutton/nginx/web.nginx
          # Handle request to bbb-web running within Tomcat.  This is for
          # the BBB-API and Presentation.
        location /bigbluebutton {
@@ -342,7 +306,7 @@ cd bigbluebutton
            include    fastcgi_params;
        }
        
-	##/etc/bigbluebutton/nginx/demo.nginx
+  ##/etc/bigbluebutton/nginx/demo.nginx
          # Forward request to /demo to tomcat.  This is for
          # the BigBlueButton api demos.
        location /demo {
@@ -367,14 +331,11 @@ cd bigbluebutton
        }
 
 ##服务命令
-	service god start
-	service freeswitch restart
-	service tomcat6 restart
-	service nginx restart
-	service bbb-open-office start
-	
-	cd /usr/share/red5/
-	sudo -u red5 ./red5.sh
-	
-	
-	
+  service god start
+  service tomcat6 restart
+  service nginx restart
+  service freeswitch  restart
+  service redis-server restart
+  service openoffice-headless start
+  service red5 restart
+
