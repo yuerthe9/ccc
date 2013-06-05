@@ -147,38 +147,98 @@ Matterhorn安装：
     update-rc.d matterhorn defaults 99
     #如果启动用户非root需要修改/etc/init.d/matterhorn
     MATTERHORN_USER="matterhorn"
-  #playback相关的matterhorn设置
-    cd bigbluebutton/record-and-playback/matterhorn
-    sudo apt-get install libxml2
-    sudo apt-get install libxml2-dev
-    sudo apt-get install libxslt-dev
-    gem install bundler
-    bundle install
-    vi webapp/bigbluebutton.yml
-      修改bbb_salt和bbb_url两个属性
-  #run
-      cd webapp
-      #如果thin执行报出require相关的错误，那么执行下列语句：
-      gem install thin
-      mkdir /etc/thin
-      ./deploy.sh
-      service thin start
-    #Edit the file /etc/nginx/sites-enabled/bigbluebutton:
-        # Bigbluebutton
-        location /matterhorn/ {
-                proxy_pass http://127.0.0.1:3000/;
-                proxy_redirect default;
-        }
-  #修改配置
+
+
+####修改BBB配置
   vi /usr/share/red5/webapps/video/WEB-INF/red5-web.xml
   vi /usr/share/red5/webapps/deskshare/WEB-INF/red5-web.xml
   #分别修改如下内容
   <property name="recordVideoStream" value="true"/>
   <constructor-arg index="0" value="true"/>
-  #ruby库准备
-    gem install redis
-    gem install builder
-    gem install streamio-ffmpeg
-    gem install mime-types
-    gem install zip
-    gem install open4
+  service red5 restart(or $RED5_HOME>./red5.sh &)
+
+####ruby库准备
+gem install  builder -v 2.1.2
+gem install  diff-lcs -v 1.1.2
+gem install  json -v 1.4.6
+gem install  term-ansicolor -v 1.0.5
+gem install  gherkin -v 2.2.9
+gem install  cucumber -v 0.9.2
+gem install  curb -v 0.7.15
+gem install  mime-types -v 1.16
+gem install  nokogiri -v 1.4.4
+gem install  open4 -v 1.3
+gem install  rack -v 1.2.2
+gem install  redis -v 2.1.1
+gem install  redis-namespace -v 0.10.0
+gem install  tilt -v 1.2.2
+gem install  sinatra -v 1.2.1
+gem install  vegas -v 0.1.8
+gem install  resque -v 1.15.0
+gem install  rspec-core -v 2.0.0
+gem install  rspec-expectations -v 2.0.0
+gem install  rspec-mocks -v 2.0.0
+gem install  rspec -v 2.0.0
+gem install  rubyzip -v 0.9.4
+gem install  streamio-ffmpeg -v 0.7.8
+gem install  trollop -v 1.16.2
+
+####程序安装
+  #cd /bigbluebutton/record-and-playback
+  mkdir build
+  cp -r slides/scripts build/
+  cp -r matterhorn/scripts build/
+  cp -r core/scripts build/
+  cp -r core/lib build/
+  cp -r build /usr/local/bigbluebutton/core
+
+  cp -R core/god/god /etc/bigbluebutton/
+  cp matterhorn/scripts/matt-pub-god-conf.rb /etc/bigbluebutton/god/conf/matterhorn-publish-conf.rb
+  cp core/god/initd.god /etc/init.d/god
+  chmod +x /etc/init.d/god
+  update-rc.d -f god defaults
+  service god start
+
+  cp -r slides/playback /var/bigbluebutton
+  cp slides/scripts/slides.nginx /etc/bigbluebutton/nginx/
+
+  cd matterhorn/webapp/
+  * The matterhorn webapp requires:
+    sudo apt-get install ruby1.8-dev
+    sudo apt-get install libxml2
+    sudo apt-get install libxml2-dev
+    sudo apt-get install libxslt-dev
+  * Install bundler and execute for get the required gems:
+    sudo gem install bundler
+    sudo bundle install
+    sudo thin install
+    update-rc.d -f thin defaults
+  ./deploy.sh
+  service thin start
+  echo "        location /matterhorn/ {
+          proxy_pass              http://127.0.0.1:3000/;
+          proxy_redirect          default;
+      }">/etc/bigbluebutton/nginx/matterhorn.nginx
+
+  vi /var/www/bigbluebutton/matterhorn/bigbluebutton.yml
+  #修改bbb_salt和bbb_url配置项
+  vi /usr/local/bigbluebutton/core/scripts/matterhorn.yml
+  #修改server和key配置项
+
+  vi /usr/local/bigbluebutton/core/scripts/slides.yml
+  #修改playback_host配置项
+
+  vi /usr/local/bigbluebutton/core/scripts/bigbluebutton.yml
+  #修改scripts_dir配置项
+
+
+  ####bbb通过ssh和matterhorn通讯，所以需要生成ssh钥
+    ssh-keygen -t rsa
+    cp ~/.ssh/id_rsa /usr/local/bigbluebutton/core/scripts/matt_id_rsa
+    chmod 600 /usr/local/bigbluebutton/core/scripts/matt_id_rsa
+    chown tomcat6:tomcat6 /usr/local/bigbluebutton/core/scripts/matt_id_rsa
+    #In Matterhorn server 
+    #将matt_id_rsa的内容追加到/root/.ssh/authorized_keys中。
+    #test
+    sudo -su tomcat6 ssh -i /usr/local/bigbluebutton/core/scripts/matt_id_rsa  -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o CheckHostIP=no root@localhost 'ls /opt/matterhorn/felix/'
+
