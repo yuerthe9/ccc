@@ -162,8 +162,9 @@ gem install  builder -v 2.1.2
 gem install  diff-lcs -v 1.1.2
 gem install  json -v 1.4.6
 gem install  term-ansicolor -v 1.0.5
-gem install  gherkin -v 2.2.9
+gem install  gherkin -v 2.2.9  -- --with-cflags=-w 
 gem install  cucumber -v 0.9.2
+#curb依赖库安装：apt-get install libcurl4-openssl-dev
 gem install  curb -v 0.7.15
 gem install  mime-types -v 1.16
 gem install  nokogiri -v 1.4.4
@@ -190,6 +191,7 @@ gem install  trollop -v 1.16.2
   cp -r matterhorn/scripts build/
   cp -r core/scripts build/
   cp -r core/lib build/
+	vi build/scripts/archive/archive.rb #将archived替换为recorded，否则始终认为录制没有结束。这应该是一个配置问题，但是找不到这个配置，所以就直接改代码了^_^！
   cp -r build /usr/local/bigbluebutton/core
 
   cp -R core/god/god /etc/bigbluebutton/

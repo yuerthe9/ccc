@@ -108,8 +108,6 @@ chown -R freeswitch:freeswitch /var/freeswitch/
 mkdir -p /var/bigbluebutton/published
 mkdir -p /var/bigbluebutton/unpublished
 mkdir -p /var/bigbluebutton/recording/status/recorded  
-mkdir -p /usr/local/bigbluebutton/core/lib/
-mkdir -p /usr/local/bigbluebutton/core/scripts
 mkdir -p /etc/bigbluebutton/nginx
 mkdir -p /var/bigbluebutton/recording/publish/presentation
 mkdir -p /var/bigbluebutton/recording/publish/slides
@@ -341,6 +339,8 @@ git checkout v0.8 -b my0.8
 
 ##服务命令
   service god start
+  service thin start
+  service matterhorn start
   service tomcat6 restart
   service nginx restart
   service freeswitch  restart

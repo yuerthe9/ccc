@@ -93,8 +93,6 @@ chown -R freeswitch:freeswitch /var/freeswitch/
 mkdir -p /var/bigbluebutton/published
 mkdir -p /var/bigbluebutton/unpublished
 mkdir -p /var/bigbluebutton/recording/status/recorded  
-mkdir -p /usr/local/bigbluebutton/core/lib/
-mkdir -p /usr/local/bigbluebutton/core/scripts
 mkdir -p /etc/bigbluebutton/nginx
 mkdir -p /var/bigbluebutton/recording/publish/presentation
 mkdir -p /var/bigbluebutton/recording/publish/slides
@@ -219,20 +217,6 @@ git checkout v0.8 -b my0.8
 
 #录制视频，源代码在record-and-playback目录
   cd record-and-playback
-  ./deploy.sh
-  ##god部署,源代码在record-and-playback/core目录
-  #对应于/etc/init.d/bbb-record-core这个服务
-  #安装god
-    gem install god
-  #部署
-  1. Copy god dir to /etc/bigbluebutton
-                cp -R core/god/god /etc/bigbluebutton/
-  2. Copy initd.god as to /etc/init.d/god
-                sudo cp core/god/initd.god /etc/init.d/god
-                chmod +x /etc/init.d/god
-                sudo /usr/sbin/update-rc.d -f god defaults
-  3. Start god
-    sudo /etc/init.d/god start
 
 #bbb-common-message
   #1、修改build.gradle
