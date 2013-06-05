@@ -191,7 +191,7 @@ gem install  trollop -v 1.16.2
   cp -r matterhorn/scripts build/
   cp -r core/scripts build/
   cp -r core/lib build/
-	vi build/scripts/archive/archive.rb #将archived替换为recorded，否则始终认为录制没有结束。这应该是一个配置问题，但是找不到这个配置，所以就直接改代码了^_^！
+	vi build/scripts/archive/archive.rb #将archived替换为recorded，否则始终认为录制没有结束。这应该是一个配置问题，但是找不到这个配置，所以就直接改代码了^_^！---配置的地方找到了：tomcat6/webapps/bigbluebutton/WEB-INF/classes/bigbluebutton.properties其中的配置项为——recordStatusDir只需将该值修改为archived即可。二者可选其一来修改，效果都是一样的，但修改配置文件的方式较好！
   cp -r build /usr/local/bigbluebutton/core
 
   cp -R core/god/god /etc/bigbluebutton/
