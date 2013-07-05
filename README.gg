@@ -1,0 +1,64 @@
+grails app:
+	1> grails create-app xxx-app
+	2> grails create-domain-class xxx
+	3> grails generate-all xxx
+	4> grails -Dserver.port=7070 run-app
+	5> 完成一个模块的CRUD功能
+	6> grails stats #查看源文件及代码量的语句。
+	7> def scaffold = xxx #使用这一句替换controller中的所有代码，程序将在运行时动态生成list、save、update等相关动作。神器！
+  8>grails prod run-app #将服务运行于生产环境，这样操作的数据将在下次启动时依旧保留。
+
+
+grails-app\conf\DataSource.groovy：
+dataSource {
+  pooled = false
+  driverClassName = "com.mysql.jdbc.Driver"
+  username = "root"
+  password = "***"
+}
+hibernate {
+  cache.use_second_level_cache=true
+  cache.use_query_cache=true
+  cache.provider_class='org.hibernate.cache.EhCacheProvider'
+}
+// environment specific settings
+environments {
+  development {
+    dataSource {
+      dbCreate = "update" // one of 'create', 'create-drop','update'
+      url = "jdbc:mysql://localhost:3306/Contact_dev"
+    }
+  }
+  test {
+    dataSource {
+      dbCreate = "update"
+      url = "jdbc:mysql://localhost:3306/Contact_test"
+    }
+  }
+  production {
+    dataSource {
+      dbCreate = "update"
+      url = "jdbc:mysql://localhost:3306/Contact_prod"
+    }
+  }
+}
+
+
+
+
+
+ def xxx = {xxx} 的结构在 Groovy 语言中叫闭包（Closure），在 Controller 中，每个闭包对应为一个 Action，即处理一个特定的 Web 请求。每个 Action 被执行完毕后，会默认跳转去执行它在 View 中同名的 GSP 页面。并把 Action 返回的数据传递给 GSP。
+
+
+
+Grails 对表单的验证提供了强大的支持，可以使用 Domain Class 的验证来实现表单的验证。
+static constraints = {
+   teamName(size:3..50,blank:false,unique:true)
+}
+类中加入个名叫 constraints 的静态 Closure，并在其中描述验证逻辑：team 的字符串长度在 3~50 之间、不能为空、而且是唯一的。但验证失败后报出的错误信息对用户来说并不友好。想要修改这些内容，需要编辑 grails-app\i18n 中的资源文件
+
+
+
+
+grails generate-all xxx 如果报错，建议使用grails clean后重试。
+

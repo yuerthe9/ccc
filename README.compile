@@ -125,8 +125,8 @@
   cp resources/dev/join-mock.xml src/conf/join-mock.xml
 #2、编译
   cd locale
-  sed -i 's/BigBlueButton/yida/g' */*.properties
-  sed -i 's/www.bigbluebutton.org/www.huiwuyi.com/g' */*.properties
+  sed -i 's/BigBlueButton/XXX/g' */*.properties
+  sed -i 's/www.bigbluebutton.org/www.XXX.com/g' */*.properties
   cd ..
   ant locales
   ant
@@ -142,7 +142,7 @@
 #2、逆向（参考的是0.8版本）
   bigbluebutton-release——/etc/bigbluebutton/
   bin——/usr/local/bin
-  cron.daily——/etc/cron.daily
+  cron.daily——/etc/cron.daily #此目录下的脚本负责定期删除音视频等
   record——没有找到
   slides:
     nopdfmark.ps——/etc/bigbluebutton/nopdfmark.ps

@@ -123,7 +123,7 @@ wget http://repo1.maven.org/maven2/commons-fileupload/commons-fileupload/1.3/com
 git clone git://github.com/bigbluebutton/bigbluebutton.git
 
 cd bigbluebutton
-git checkout v0.8 -b my0.8
+git checkout v0.81b -b my0.81
 ###########################################################################################
 ###### 编译源代码进行部署
 ###########################################################################################
@@ -214,22 +214,21 @@ git checkout v0.8 -b my0.8
     // This is the URL for the BigBlueButton server
     String BigBlueButtonURL = \"http://42.120.7.154/bigbluebutton/\";//this is ip for remote
     %>" > /var/lib/tomcat6/webapps/demo/bbb_api_conf.jsp
-
-#录制视频，源代码在record-and-playback目录
-  cd record-and-playback
-
-#bbb-common-message
-  #1、修改build.gradle
-    flatDir name: 'fileRepo', dirs: "/home/firstuser/dev/repo"
-    to
-    flatDir name: 'fileRepo', dirs: "repo"
-  #3、编译
-    ./vm-build.sh
-  #4、结果
-    repo/bbb-common-message-0.8.jar
-  #5、部署
-    cp repo/bbb-common-message-0.8.jar /var/lib/tomcat6/webapps/bigbluebutton/WEB-INF/lib/
-    cp repo/bbb-common-message-0.8.jar /usr/share/red5/webapps/bigbluebutton/WEB-INF/lib/
+  #bbb-lti#和“聊天”程序有关
+  	#To generate the war file
+		cd bbb-lti
+	  grails clean
+	  grails war
+	  sudo cp lti-0.1.war /var/lib/tomcat6/webapps/lti.war
+		sudo vi /var/lib/tomcat6/webapps/lti/WEB-INF/classes/lti.properties
+		#Edit the URL and Salt of the BigBlueButton server you are going to connect to
+		bigbluebuttonURL=http://yourbigbluebuttonserver.com/bigbluebutton
+		bigbluebuttonSalt=yoursalt
+		#Edit the LTI basic information
+		ltiEndPoint=http://yourbigbluebuttonserver.com/lti/tool.xml
+		ltiConsumers=demo:welcome,consumer1:secret1
+		#Restart tomcat
+		sudo service tomcat6 restart
 
 #设置nginx配置
   vi /etc/bigbluebutton/nginx/client.nginx
