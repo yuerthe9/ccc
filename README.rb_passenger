@@ -1,0 +1,16 @@
+gem install passenger -v 3.0.11
+passenger-install-apache2-module
+passenger-install-apache2-module --snippet | sudo tee /etc/apache2/conf.d/mconf-passenger
+a2enmod rewrite
+rm /etc/apache2/sites-enabled/*
+curl https://raw.github.com/mconf/mconf-web/latest/config/webserver/apache2.example -o /etc/apache2/sites-available/mconf-web
+#change "YOUR_HOST" by your IP or domain and "/YOUR_MCONF_WEB/public" 
+a2ensite mconf-web
+service apache2 restart
+
+##Updating Passenger
+service apache2 stop
+gem uninstall passenger
+passenger-install-apache2-module
+gem list #检查passenger版本
+

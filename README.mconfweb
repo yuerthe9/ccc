@@ -1,0 +1,108 @@
+Installing Mconf-Web
+#System Packages
+sudo apt-get update
+sudo apt-get install curl make git-core libruby aspell-es aspell-en libxml2-dev libxslt1-dev \
+  libmagickcore-dev libmagickwand-dev imagemagick libmysqlclient-dev \
+  mysql-server zlib1g-dev build-essential libreadline-dev nfs-common libcurl4-openssl-dev
+
+#To install Ruby1.9.2 (p290)
+	#To install RVM run:
+	curl -L https://get.rvm.io | sudo bash -s stable --without-gems="bundler"
+	#add your user to the rvm group:
+	sudo adduser mconf rvm # change "mconf" to your username
+	#After that, restart your terminal! 
+
+	#see the dependencies RVM requires
+	rvm requirements
+	#Install ruby and create a gemset for mconf:
+	rvm install 1.9.2-p290
+	rvm gemset create mconf
+	rvm use --default 1.9.2-p290@mconf
+	#Then install bundler in the gemset global to be available to all other gemsets:
+	rvm use 1.9.2-p290@global
+	gem install bundler -v 1.0.18
+	rvm use 1.9.2-p290@mconf
+
+#Download the application
+	git clone git://github.com/mconf/mconf-web.git ~/mconf-web/current/
+	# if you'll use Capistrano. See http://code.google.com/p/mconf/wiki/MconfWebDeploymentWithCapistrano
+	# when other processes are executed (god and delayed_job) and needs this to be done:
+	rvm rvmrc trust ~/mconf-web/current/.rvmrc
+	#change your repository to the version you want to deploy. If you don't do this, you'll be deploying the master branch, and it is not recommended
+	cd ~/mconf-web/current
+	git checkout latest     # go to the branch that points to the latest version
+	# You can also pick a specific version if you need to. For example:
+	# git checkout v0.7     # go to version 0.7
+	#With the repository you can now install the dependencies
+	git submodule init
+	git submodule update
+	bundle install --without=development test
+
+#Edit the configuration files
+	#There are two files that need to be configured. At first, copy the example files:
+	cp ~/mconf-web/current/config/setup_conf.yml.example ~/mconf-web/current/config/setup_conf.yml
+	cp ~/mconf-web/current/config/database.yml.example ~/mconf-web/current/config/database.yml
+	#To learn more about the other options in these files, see http://code.google.com/p/mconf/wiki/MconfWebSetupConf
+
+#Database user
+	mysql -u root -p
+	CREATE USER "mconf"@"localhost" IDENTIFIED BY "password";
+	GRANT ALL PRIVILEGES ON mconf_production.* TO "mconf"@"localhost" IDENTIFIED BY "password";
+	FLUSH PRIVILEGES;
+
+#Application configurations
+	#We'll setup the database and generate a new secret key for rails:
+	cd ~/mconf-web/current
+	bundle exec rake setup:db RAILS_ENV=production
+	bundle exec rake secret RAILS_ENV=production
+
+#Web server
+	#The web server we use to Apache.
+
+#System-wide configurations
+	# you need to do on your server to run Mconf-Web.
+	#1>God: a process monitoring tool, see:http://code.google.com/p/mconf/wiki/MconfWebDeploymentInstallGod
+	#2>Whenever: a gem used to set up the crontab with tasks for Mconf-Web, see: http://code.google.com/p/mconf/wiki/MconfWebDeploymentGuideWhenever
+	#3>Logrotate: a tool to reduce the size of logfiles, see:http://code.google.com/p/mconf/wiki/MconfWebDeploymentInstallLogrotate
+	#The first thing you might want to do is:http://code.google.com/p/mconf/wiki/MconfWebConfiguring
+
+
+Maintenance tasks
+#Restart
+	#To restart the application you need to restart the web server and god:
+	sudo service apache2 restart
+	sudo /etc/init.d/god terminate
+	sudo /etc/init.d/god start
+#Update
+	#update your repository and checkout the version you want:
+	cd ~/mconf-web/current
+	git pull
+	git checkout v0.7  # go to version 0.7
+	#You can use the branch "latest"
+	git checkout latest
+	git pull origin latest
+	#Update the dependencies:
+	git submodule update
+	bundle install --without=development test
+	#Migrate the database:
+	bundle exec rake db:migrate RAILS_ENV=production
+	#Update the crontab:
+	bundle exec whenever --update-crontab RAILS_ENV=production
+#Backup
+	# backup
+	mysqldump -u root -p mconf_production > mconf_production-`date +%F`.sql
+	# restore
+	mysql -u root -p mconf_production < mconf_production-2011-06-21.sql
+	#you backup the files in the following folders:
+	~/mconf-web/attachments/
+	~/mconf-web/public/logos/
+	~/mconf-web/log/
+
+
+
+#Apache2
+  #apache2: Could not reliably determine the server's fully qualified domain name
+  vi /etc/apache2/httpd.conf 
+  ServerName <IP> #add item
+
+  #

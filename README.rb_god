@@ -1,0 +1,18 @@
+cd ~/mconf-web/current
+gem install god -v 0.12.1                # this version is also defined in the Gemfile
+rvm wrapper 1.9.2-p290@mconf bootup god
+mkdir -p /etc/god/conf.d/
+curl https://raw.github.com/mconf/mconf-web/latest/config/god/config -o /etc/god/config
+curl https://raw.github.com/mconf/mconf-web/latest/config/god/delayed_job.god -o /etc/god/conf.d/delayed_job.god
+#change RAILS_ROOT env and uid/gid
+curl https://raw.github.com/mconf/mconf-web/latest/config/god/init_script -o /etc/init.d/god
+chmod a+x /etc/init.d/god
+update-rc.d god defaults
+/etc/init.d/god start
+
+
+##Updating God
+/etc/init.d/god terminate
+gem uninstall god
+bootup_god -v
+/etc/init.d/god start
