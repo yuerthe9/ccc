@@ -85,3 +85,26 @@ word/ppt等乱码问题：
 关闭“桌面共享”
 	将client的config.xml中的DeskShareModule注释掉即可。
 
+
+客户端全屏
+修改文件：bigbluebutton-client\src\org\bigbluebutton\modules\videoconf\business\VideoWindowItf.as
+import flash.display.StageDisplayState;
+protected function onDoubleClick(event:MouseEvent = null):void {
+	// it occurs when the window is docked, for example
+	if (!this.maximizeRestoreBtn.visible) return;
+	
+	//add this line
+	goFullScreen();
+	this.maximizeRestore();
+}
+//add this function
+public function goFullScreen():void
+{
+	if (stage.displayState == StageDisplayState.NORMAL) {
+		stage.displayState=StageDisplayState.FULL_SCREEN;
+	} else {
+		stage.displayState=StageDisplayState.NORMAL;
+	}
+}
+
+
