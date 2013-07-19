@@ -108,3 +108,16 @@ public function goFullScreen():void
 }
 
 
+
+
+
+替换bigbluebutton最开始的加载信息
+src/org/bigbluebutton/main/model/BigBlueButtonPreloader.as:34, initializingLabel = “BigBlueButton starting…”;
+src/org/bigbluebutton/main/views/LoadingBar.mxml: 74, this.label = ‘Connecting to the server’
+加入会议后需要修改的几个地方
+./src/org/bigbluebutton/modules/videoconf/maps/VideoEventMap.mxml:122: publishWindow.title = module.username + “ (you)”;
+./src/org/bigbluebutton/modules/viewers/views/NameItemRenderer.mxml:30: <mx:Label id=“nameLabel” textAlign=“left” text=“{data.name} {data.me ? ‘(you)’ : ''}”
+修改完后重新编译下面的模块：
+ant build-video build-viewers build-bbb-main
+最后记得清理浏览器缓存。
+

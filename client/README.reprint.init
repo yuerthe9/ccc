@@ -1,0 +1,178 @@
+作为flex的初学者，大致浏览的一下flex官方的视频教程，接下来就打算了解bigbluebutton的客户端了。进程远没有我当初想象中的那么顺 利，经常的都会碰到一些问题。相信在解决一个个问题的过程中，会慢慢的熟悉flex和这个产品。通读文档肯定是来不及，时间紧迫，很多不清楚的地方就查阅 一下资料，然后自己推测或猜测的，可能会有些不对的地方，但有需要的时候一定会查阅资料弄清楚问题。
+
+
+首先从启动开始，客户端已经通过flex build编译通过，但是启动的时候并没有显示加载的进度条，而是卡在了初始画面，为了找到原因，只有探索源码。第一步，要知道flex程序的入口在哪里，一个flex程序可以有很多mxml和as文件，但是包含Application只有一个，这个Application在mxml中用来标识，把鼠标移到到其上，可以看到其对应的as类mx.core.Application。
+
+flex程序感觉写起来要敲很多的字符，并不简洁，也不明了。可以看到BigBlueButton实际上就只做的下面几个事情：
+
+1. 声明pageTitle为“BigBlueButton”。
+2. 声明应用程序的布局采用绝对布局的方式。
+3. 构造了一个ResourceUtil对象，处理i18n。
+4. 声明了IDragManager，可能是支持窗口拖动？不太清楚，先跳过。
+5. 声明了HistoryManager，绑定浏览器的前进后退操作？不太清楚，先跳过
+6. 声明了一个私有的handleChatEvent，没有看到有引用的地方，函数体里面也是打了一条trace，不太清楚，先跳过
+7. 然后声明了一个ApplicationEventMap，这个是mate框架相关的，定义了一些事件处理的映射关系。不太清楚，先跳过
+8. 声明了一个MainApplicationShell，估计也是和mate框架相关，定义了app的视图。不太清楚，先跳过
+9. 在application中，可以看到有一个preloader的属性，其中指向了“org.bigbluebutton.main.model.BigBlueButtonPreloader”，这里有点类似js, BigBlueButtonPreloader是一个as文件。
+
+由此可以看到，入口的地方应该是顺着preloader往下走，接下来看看BigBlueButtonPreloader都干了些什么。
+
+可以看到有一个“import flash.display.Sprite;”查阅了一下“在不使用 Flash 动画时用这个 Sprite ，Sprite 是轻量级的容器，不包括时间轴的容器，比 MC 小一些，更少占用内存(系统资源)。”
+
+下面这两个应该就是显示进度条相关的，RSL(Runtime Shared Libraries)。
+import mx.events.RSLEvent;
+import mx.preloaders.DownloadProgressBar;
+
+然后定义了一个继承自DownloadProgressBar的类并自定义了一些显示的字符串。这里好像没看到有什么特殊的逻辑。
+
+接下来再看MainApplicationShell,这里主要是定义了UI视图，最外层的是一个VBox，可以看到VBox有一个creationComplete属性，指向一个initialzeShell()函数。
+
+再下面的一系列的声明了一系列的事件监听器，先跳过。
+
+再下面是，这个也先跳过，再后面分析了mate框架就明白了。
+
+里面是as脚本，定义了上面的事件监听器函数，基本上都是根据事件来更新UI显示的。
+
+再往下就是一些UI的布局了：MainToolbar，然后是MainCanvas，在MainCanvas中定义了LoadingBar和BrandingLogo，其中BrandingLogo(.mxml)中可以添加自己Logo图片。再往下就是ControlBar,下面是copyright和一个log按钮（可以打开调试窗口看日志）和reset layout窗口。
+
+看到这里，都还没什么头绪，为什么会freeze住，但是从上面发现可以打开调试窗口，显示日志，接下来再来一次，进度条显示为“connecting to the server”，难道server没连上？打开调试窗口，可以看到，语言和模块都已经加载成功，并且已经能够联通rtmp服务器，最下面显示：
+
+11/3/2011 15:44:02.980 JoinService:load(…) http://64.104.177.100/bigbluebutton/api/enter
+11/3/2011 15:44:03.396 Join FAILED =
+FAILED
+Could not find conference null.
+
+加会失败？为什么刚开始登录的时候就会加会？从日志里面看到对应的url地址为：http://64.104.177.100/bigbluebutton/api/enter，想到之前修改过config.xml，其中有一项是，这里我是修改过的，最初的值不太记得了，但是好像官网上说如果要调试运行，要将host修改一下，好像和join-mock有关系，但是当时感觉官网没说太清楚，再查阅一下吧，又看了一下，只是提到了要用这个替换掉，另外有些帖子说join-mock文件没更新，连不上freeswitch。猜测这个join-mock应该是模拟http://64.104.177.100/bigbluebutton/api/enter的返回值，但是为什么用flex编译调试就有问题，直接从浏览器打开就没问题呢？看来还得继续再分析。
+
+首先第一步就要看哪里会读取config.xml配置了。搜索到了，这个在ApplicationEventMap.mxml文件中引用了，下面还有一行，不清楚是做什么的，joinResultMock.xml这个文件不存在。
+
+
+另外再搜索join-mock.xml，可以看到这个在JoinServiceTest.as文件中引用，这个看起来像是Testcase的程序，怎么会跑到这里来？再搜索一下JoinServiceTest这个类，看看哪里有引用到，查了一下，只有在UserTestSuite.as中引用到了。
+
+后来发现config.xml还有一处地方引用到了，ConfigParameters.as，应该就是这里了。可以看到这里是远程的获取config.xml文件，从这里可以知道，我们可以动态的去配置config.xml，不需要重启服务，只需要刷新页面就可以让配置生效了。另外这里host配置项目读取后放置到public的变量host中去了，接下来就要去看哪里引用了这个类。ConfigParameters引用的地方倒是比较好找，但后面就不容易了，由于flex本质上也是一个事件驱动的，再加上这个项目使用了mate这个事件框架（我的理解是mate本质上是封装了flex底层的事件模型，使得各个模块之间通过信号事件进行交互，来达到模块间解耦的目的，还没仔细看，现在的理解是这样的）。
+
+这样单看代码不是特别容易，只好结合调试一起来看，但事件机制导致在不是特别熟悉代码的情况下调试也不是那么容易，因此要利用一切可以利用的信息，比如，在UI上面显示的一些状态提示字符。在最后一会，屏幕上显示了“Connecting to the server”，搜索了工程，发现这个在“en_US/bbbResources.properties”中 。这个文件是多语言中的en_US版本，看来多语言的支持是做在了客户端，并不需要从服务器去更新。接下来搜索“bbb.mainshell.statusProgress.connecting”，发现在LoadingBar.mxml中：
+
+private function testRTMP(e: PortTestEvent):void{
+
+//- Cannot get locale string this early in loading process
+this.label = ‘Connecting to the server’;
+//ResourceUtil.getInstance().getString('bbb.mainshell.statusProgress.connecting');
+}
+
+这里应该就是对应的位置，可以看到多语言的资源还没加载完，所以这里用英文显示了，如果要做汉化，这里也是需要修改的地方。
+
+可以看到最终浏览器中的flex应用给出的提示是“Sorry, we cannot connect to the server.”，再打开log窗口，看到连的服务器是“64.104.177.100”，刚换了一下网络，从公司网络切换到家里的网络了，地址已经变了，这个错误和之前出现的并不一样。
+
+
+有点奇怪的是，本已经通过bbb-conf –setip修改了配置中的ip地址了，但是为什么还是错误的ip地址，难道不是从远程获取的（远程是修改了/var//www/bigbluebutton/conf下面的，并没有修改设置的dev目录下的，我已经将配置改为使用dev环境）？但是明明是URLRequest获取的啊，难道有cache?但是可以看到，代码中获取时加上了时间参数，以避免有cache，_urlLoader.load(new URLRequest(file + “?a=” + date.time)); 只有再调试一把了，看看Network Monitor窗口里的显示（多多少少觉得之前的flex视频教程的基础部分没白看，多少都能用到一些）。居然没有，还不清楚这个Network Monitor是怎么工作的，不过我猜测也就是hack了flex的SDK里面的网络操作。另外构造URLRequest的时候，并没有加上域名或ip的前缀，难道真的是访问本地文件（好像不应该访问远程的，因为现在调试运行时，远程ip都还没有）？先看看SDK说明。看URLRequest里最后一个例子提到：如果没有域名或ip，那这个文件应该就是当前flash的文件所在目录的相对位置，但是bigbluebutton.swf在bin目录下，下面的conf/config.xml配置的是192.168.1.102，应该是没有使用这个配置，我怀疑调试运行的时候，默认的工作目录就是BigBlueButton.mxml所在的目录。当然这是我的猜测，网上还没找到相应的说明。先修改了试试先。如果改了还不行就可能是cache的原因了。
+
+经过修改后，重新运行发现配置生效了。真是在摸索中前进，都是苦力活。好了，现在回到了之前的bug，
+
+
+11/3/2011 22:02:17.954 JoinService:load(…) http://192.168.1.101/bigbluebutton/api/enter
+11/3/2011 22:02:18.063 Join FAILED =
+FAILED
+Could not find conference null.
+
+
+接下来看日志，看起来JoinService是一个加会的服务，怎么会跑到这里来，一开始就加会了？哦，好像是的，demo打开的那个web页面是html的，不是flash的。
+
+
+那这个问题看来是清楚了，加会但是参数不对，会议根本就不存在。接下来要看看的就是加会的api和对于的官网文档里面提到的那个join-mock文件怎么使用的了。
+
+至此为止，为什么用'conf/join-mock'来替换掉之前的那个url(http://192.168.1.101/bigbluebutton/api/enter)就很清楚了，join-mock直接返回了一个mock的会议信息。
+
+好了，经过验证已经可以成功加会了。是的，如果我按照官网的说明，根本不会遇到这些乱七八糟的问题，但是，通过解决这个问题，让我对bbb-client端的代码有了一个初步的熟悉，特别是我这种一行flex代码都没写过的人来说，我感觉已经找到那么一点门路了。
+
+接下来还得继续写，因为还没有开始写正题 - 初始化的流程，但上面是一个不错的开端。再继续努力吧。
+
+
+前面一篇文章已经提及到了bigbluebutton的main目录结构，这里再详细分析一下。bbb-client采用了mate框架。events目录定义了主程序逻辑相关的事件，这些事件都是继承自flash.events.Event，并且事件的bubbles属性要设置为true才行(mate框架的需要)，具体的event可以在用到的时候大致看一下，就是一个数据结构，没有什么逻辑。
+
+ApplicationEventMap.mxml
+
+mate框架的中定义了一些EventHandlers，其中的type属性就是事件类型(字符串)，可以生成generator属性指定的对象，cache属性指定对象的作用域，global就是全局作用域。FlexEvent.PREINITIALIZE是预初始化的事件，如果有全局的对象，可以在这里指定。
+
+下面的处理的事件有下面几类，在内定义了，表示事件发生时调用其generator属性指定的method，并可以在arguments中指定参数：
+
+PortTestEvent - 触发测试RTMP端口，端口测试成功，端口测试失败。对应的类为ModuleProxy，可以参考对应的as文件。
+
+LogoutEvent - 用户logout调用UserService.logoutUser()和ModulesProxy.handleLogout()，测试连接断开调用UserService.disconnectTest()
+UserServicesEvent - 启动服务，也是调用UserService.startService()方法
+
+UsersConnectionEvent - 连接成功，也是调用UserService.userLoggedIn()方法
+
+SuccessfulLoginEvent - 成功登录，调用ModulesProxy.loadAllModules()
+
+RaiseHandEvent - 举手发言，调用UserService.raiseHand()
+
+LowerHandEvent - 放弃发言，调用UserService.lowerHand()
+
+BroadcastStartedEvent - 流广播开始事件（具体是什么流还不太清楚），调用UserService.addStream()
+
+BroadcastStoppedEvent - 流广播结束事件，调用UserService.removeStream()
+
+KickUserEvent - 踢人事件， 调用UserService.kickUser()
+
+ConfigEvent - 配置读取后触发，依次调用ConfigManager.setConfig()，SkinningService.loadSkins()。
+
+下面紧接的两个HTTPService好像没什么用，并没有调用。
+
+需要重点分析的是model目录下的文件。
+
+BigBlueButtonPreloader - 下载进度条，这里主要是flash的下载和初始化进度，之前也看到过LoadingBar.mxml，那个主要是显示模块的加载进度，模块加载后面再分析。
+
+ConferenceParameters - 存放会议的相关信息，没什么逻辑，就是一个结构体。包括会议名称，当前的用户名，用户的角色（协调者或者普通参与者），room id，语音会议bridge的地址（asterisk或者freeswitch），语音会议bridge的外部地址（这里不太确定），欢迎提示，会议id，外部用户id（不清楚），logout地址，connection（不清楚是什么连接，和red5的？），内部用户id（不清楚），是否录制会议。
+
+ConfigParameters - 加载conf/conf.xml配置文件，这里会构造ModuleDescriptors，后面可以再仔细分析。
+
+LayoutOptions - 控制一些UI上的显示。
+
+PortTest - 用来测试多种flash支持的网络协议的联通性
+
+PortTestProxy - 对PortTest做了个包装，PortTest看代码应该是第三方的。
+
+User - 也是一个结构体
+
+model下面还有一个User子目录，按理来说是和用户关联比较紧密的：
+Status - key,value状态信息。
+StatusCollection - 存储和管理Status信息。
+BBBUser - 这里维护用户的状态，包括：当前的presenter是谁，是否有媒体流，是否举手了。
+Conference - 维护会议的用户，包括自己和其他人的信息，从可以看到这里是为了显示用的。
+JoinService - 发起加会请求，成功后保存会议信息。
+NetConnectionDelegate - 网络连接和重连
+UserSOService - 举手，踢人，连接流媒体，连接服务器
+UserService - 包装 JoinService和UserSOService。
+
+接下来分析一下modules目录，整个客户端的框架基本上就分析完了。
+bigbluebutton采用模块化的方式来组织，在common目录下面，可以看到有三个接口，一个是IBbbModuleWindow，这个是模块的窗口，通过这个接口来获取窗口位置来布局，IBigBlueButtonModule，这个用来设置模块的属性，这些属性都是从config.xml中读取的，并通过事件传递过来的。
+
+在modules目录下面，是模块相关的代码，在src目录下面，有很多*Module.mxml，这些都是继承了IBigBlueButtonModule，而且基本上每个模块都定义了自己的EventMap，mate可以定义多个EventMap，这些都会挂接到一个总的event bus上去，每个模块会定义自己的event和对应的event映射和处理函数，也可以处理全局的一些事件。
+
+初始化流程
+
+1. BigBlueButton.mxml的preloader第一步被执行：org.bigbluebutton.main.model.BigBlueButtonPreloader，会下载BigBlueButton.swf文件。
+
+2. 建立ApplicationEventMap，设置事件处理表，在FlexEvent.PREINITIALIZE中，还会创建一些全局对象，包括ModulesProxy，UserService，ConfigManager，在ModulesProxy中会依次创建ModulesDispatcher, PortTestProxy和ModuleManager，ModulesDispatcher用来发送模块相关的一些事件，PortTestProxy用来测试rtmp和rtmpt端口是否是通的，ModuleManager用来管理模块的（加载，删除，传递配置信息）；UserService用来加会的。ConfigManager作为一部全局的对象来存储配置信息。ModuleManager的构造函数中创建了ConfigParameters，在ConfigParameters的构造函数中，回去获取conf/config.xml，这是个异步的过程。
+
+3. BigBlueButton.mxml的最下面的MainApplicationShell会创建一个初始化的布局，也就是打开页面后看到的进度条还有下面的一些调试窗口按钮等。ResourceUtil 初始化会加载conf/locale.xml，并且会根据默认的语言来加载对应的swf资源。
+
+4. 配置加载成功回调到ConfigParameters::handleComplete，会将模块配置信息放到ModuleDescriptor中，并回调ModuleManager::handleComplete，在这中间会先触发PortTestEvent.TEST_RTMP，然后检查模块依赖，看所需要的模块是否都在配置列表中，最后触发ConfigEvent.CONFIG_EVENT事件。
+
+
+5.ConfigEvent.CONFIG_EVENT事件有几个响应的地方，一个是在ApplicationEventMap中，会调用ConfigManager::setConfig存储配置，会调用SkinningService::loadSkins更换皮肤。第二个是在MainApplicationShell.mxml中，设置LOG窗口可见性，不过这里好像屏蔽掉了，是通过另外一个事件configLoadedEvent来触发，设置多个窗口的可见性。第三个是在MainToolbar.mxml中，设置语言选择栏可见性和帮助的URL链接。
+
+
+6.PortTestEvent.TEST_RTMP事件有几个响应的地方，一个是ApplicationEventMap中，会调用ModuleProxy::testRTMP测试端口，另外一个是在LoadingBar.mxml中，这里只是用来显示。这里连的uri是在config.xml中指定的 。如果测试成功，会触发PortTestEvent.PORT_TEST_SUCCESS，否则会触发PortTestEvent.PORT_TEST_FAILED。如果失败，则继续进行RTMPT的测试。如果成功，则调用ModulesProxy::portTestSuccess，在其中调用modulesManager.startUserServices()，这里会传递连接成功的协议类型，并替换掉原先配置中的协议类型（rtmpt没开源，按理应该不支持，可能为了以后扩展用吧），接下来会触发UserServicesEvent.START_USER_SERVICES。会调用到UserService.startService()。
+
+7. startService中会调用joinService.load来加载配置中的中host指定的地址，如果不是调试，host="http://192.168.1.101/bigbluebutton/api/enter"，具体参数是怎么传到这个API的还不太清楚，抓包分析猜测是通过seesionid。上面这个API会返回会议的信息。然后会触发ConferenceCreatedEvent.CONFERENCE_CREATED_EVENT，并通过NetConnectionDelegate创建一条长连接到指定的地址。
+
+8. ConferenceCreatedEvent.CONFERENCE_CREATED_EVENT的处理也有两个地方，一个是在viewsWindow.mxml中，这里是视图上的显示，另外一个是APIEventMap，这里只是将meeting信息存储在UserManager中。
+
+9. 第6步中的连接创建成功后，会触发UsersConnectionEvent.CONNECTION_SUCCESS，这个事件也有两个处理的地方，一个是ConnectionLostWindow.mxml中，这里会关掉连接断开的窗口，并重新刷新页面；另一个地方是ApplicationEventMap.mxml，会调用UserService.userLoggedIn()，在这里会调用UsersSOService.join()，会获取当前与会的人员信息，并触发ParticipantJoinEvent.PARTICIPANT_JOINED_EVENT。随后会触发SuccessfulLoginEvent.USER_LOGGED_IN。
+
+10. SuccessfulLoginEvent.USER_LOGGED_IN事件的处理，一个是UI上的显示toolbar，另一个是ModulesProxy.loadAllModules()，从这一步开始起，就依次从配置中给定的模块的uri加载模块了。在模块加载过程中，会依次收到MODULE_LOAD_PROGRESS事件通知，这个会更新UI的进度条显示，当所有的模块都加载完成后，然后会检查locale的版本信息，（这里好像遗漏了locale资源的加载步骤，后面再看吧），然后调用module的start()方法，最后触发ALL_MODULES_LOADED，这个事件的响应处理在ui上就是移除掉进度条。而模块的窗口显示和其他UI按钮的显示，则由模块自己来触发，比如OpenWindowEvent，这个事件触发后会由MainCanvas.mxml处理，调用模块窗口的getPrefferedPosition()获取窗口位置来布局。
+
+至此，bigbluebutton客户端的框架加载流程已经分析完，其中具体模块的加载和具体的应用有关系，下周打算分析其中的语音模块，接下来会分析presenter模块和video模块，并且打算尝试修复presenter的BUG（好像0.8版本并没有改进）。
+

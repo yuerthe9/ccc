@@ -1,0 +1,80 @@
+今天周末，时间有限，打算泛泛的看一下代码，做点记录。这篇就大致写一下代码结构好了，bbb-client的主要代码在org.bigbluebutton下，里面有五个目录
+
+common - 公共目录，包括…
+core - 读取配置和配置管理
+main - 住程序和模块框架的代码
+modules - 各个功能模块的代码
+util - 工具类代码，包括日志模块，多语言加载模块等
+
+初看有点地方都不太合理，比如core中的文件很少，也不算什么核心代码。后面再看吧。
+
+先看main里面的代码吧，看起来这是个不错的选择，因为程序框架的主要逻辑都在这里，而功能模块的分析也要先了解主程序的运行才方便理解，其他地方的一些基础代码可以在看主程序时顺带看看就好。
+
+main里面有五个目录：
+
+api -
+event - 自定义事件，用来解耦模块
+maps - 消息映射
+model - 控制逻辑
+views - 视图
+
+先挑简单的看，先看视图。
+BrandingLogo.mxml - 这个可以放自定义的Logo，当然，这里得自己加代码，最简单的就是放个。
+
+ConnectionLostWindow.mxml - 这个是重连时显示的窗口，其中的ProgressBar有一个属性indeterminate，这个为true时，在现实进度的时候，就没有百分百的显示，因为断开连接后是没法去估计什么时候能重连上的。其中为重连事件注册了一个回调函数，在重连上后，重新打开页面，关闭这个popup窗口。这里有行没用的代码，var pageURL:String = mx.core.Application.application.url.split(“/”);
+
+LanguageSelector.mxml - 这里是个combobox，其中dataProvider绑定了一个数组变量，flex这种数据绑定的总是要显示的去在变量前加，难道编译器就不能把这块给屏蔽掉吗，说实话不太喜欢flex，感觉语法不简练，要多敲不少和逻辑没太大关系的代码，就感觉在手写html文件一样写代码，你要写的代码逻辑都淹没在一堆和主逻辑不相关的标记中了，有了flex build的智能提示是可以少敲点代码，但看起来还是很不爽。这里在语言选择变化后会调用到ResourceUtil来修改语言显示。
+
+LoadingBar.mxml - 这里就是最开始加载时显示的进度条了，可以看到这有几个事件绑定：
+
+ModuleLoadEvent.MODULE_LOADING_STARTED - 模块开始加载
+ModuleLoadEvent.MODULE_LOAD_PROGRESS - 模块加载进度
+ModuleLoadEvent.ALL_MODULES_LOADED - 所有模块成功加载
+PortTestEvent.TEST_RTMP - 开始RTMP端口测试
+PortTestEvent.TUNNELING_FAILED - Tunneling测试失败
+
+再看几个事件处理函数
+moduleLoadingStarted
+这里面会统计模块的总数，并在进度条显示总共会加载多少个模块，其中可以看到引用多语言文件中的bbb.mainshell.statusProgress.loading = Loading {0} modules，这里面有个{0}可以被替换到，看来properties中还可以使用模板语法。另外还初始化了每个模块的加载进度为0。
+
+moduleLoadProgress
+这里会更新总的加载进度。这里有个疑问，各个模块能同时加载吗？记得调试的时候看flex也就只有一个线程，不知道是否支持多线程。
+
+allModulesLoaded
+模块加载成功，移除进度条
+
+testRTMP
+显示在测试RTMP连接
+
+tunnelingFailed
+显示连接失败
+
+LoggedOutWindow.mxml
+这个就是点击了logout按钮后弹出来的，里面就只有一个OK按钮，点击之后就调用logout的API，“/bigbluebutton/api/signOut”，这里感觉有点不太合理，点击退出就就没cancel，只能ok。另外这里显示的字符串也没有加入到多语言支持。
+
+LogWindow.mxml
+这个用来显示日志，里面有个TextArea，还有控制面板，里面可以过滤日志，关闭日志显示，清除日志，手工刷新日志。这里有点要提到的是，里面的成员变量并没有采取和普通的变量区别的写法，有些地方也没有加this，看起来总觉得不那么舒服。
+另外测试的时候发现filter后的标记在clear后也不会清除掉。Clear掉后再refresh，还是会出现之前的日志。这里还有些bug的。
+还有，这里log窗口是有滚动条的，我记得presenter的窗口好像没有，也许可以参考着加上。
+需要说明的是，这里的日志并不会自己滚动，而是需要手动刷新，而从TextArea中获取更新的值也有点意思，从flex文档中可以看到“The TextArea control is a multiline text field with a border and optional scroll bars.”，另外这里用的是MDIWindow，Highlighter也是来是flexlib中，displayLogMessages()肯定是在窗口显示出来前被调用的。
+
+MainToolbar.mxml
+这里是toolbar的UI，没什么特殊逻辑，就是一些事件处理，但是这里loggedIn的参数都没用到，感觉有点乱。有点要提到的是，这里toolbar的按钮是可以动态的扩展的，也就是说，自己写了一个扩展模块，可以通过事件添加按钮到toolbar。
+
+MainCanvas.mxml
+可以向canvas上添加窗口，窗口要实现IBbbModuleWindow接口，可以在实现时说明窗口的布局方式。这里还实现了对video窗口的布局。默认是空的，窗口都是动态加载的。
+
+MicSettings.mxml
+这个是麦克风设置的窗口。
+
+OldLocaleWarnWindow.mxml
+用来给出locale的版本不对的提示，在从远端获取了conf.xml配置后，会比较其中的多语言版本号，和本地的比较。
+
+MainApplicationShell.mxml
+这就是程序的主窗口了，其中包括MainToolbar, MainCanvas（初始化时有进度条和logo，加载完后被移除）和控制面板（copyright, video layout，日志显示按钮，和重置布局按钮）。
+
+上面其他的一些窗口都是在程序运行时，动态的创建和销毁的。
+
+initializeShell()中只创建了一个全局的Dispatcher对象，该对象用来分发事件。具体的流程可能还要看看mate framework。 
+
+
