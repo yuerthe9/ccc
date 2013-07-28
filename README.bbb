@@ -42,17 +42,15 @@ gradle使用本地依赖文件进行编译：
 
 
 word/ppt等乱码问题：
-	#cd /usr/share/fonts
-	#mkdir 11
+	cd /usr/share/fonts
+	mkdir 11
 	#(把windows下字体文件复制到11目录)
-	#chmod -R 755 11
-        #cd 11/
-	#mkfontscale
-	#mkfontdir
-	#fc-cache -fv
-	##上述代码是linux下的ms字体安装步骤，但是并不能解决bbb上传ms产品中文乱码的问题。
-	##具体步骤很简单，如下：
-	将宋体字文件复制到/usr/lib/libreoffice/share/fonts/truetype/即可，因为出现乱码是在文件转换过程中即和libreoffice息息相关，此之为要节所在。
+	chmod -R 755 11
+    cd 11/
+	mkfontscale
+	mkfontdir
+	fc-cache -fv
+    #将宋体字文件复制到/usr/lib/libreoffice/share/fonts/truetype/即可，因为出现乱码是在文件转换过程中即和libreoffice息息相关，此之为要节所在。
 
 
 进入后的页面title设置：
